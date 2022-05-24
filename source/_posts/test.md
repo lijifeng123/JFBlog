@@ -1,12 +1,17 @@
-# 这是一个测试发布的文章
+---
+title: Hello World
+date: 2022.5.16
+tags: 生活
+---
 
-```
-title: 这是一个测试发布的文章
-```
+
 
 - 序言
 - 目录
 - 内容
 - 总结
 
-![222](/Users/mrming/Desktop/222.png)
+
+
+CI持续集成
+
