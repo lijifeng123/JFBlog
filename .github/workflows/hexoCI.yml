@@ -40,17 +40,3 @@ jobs:
       run: |
         # publish
         hexo clean && hexo generate && hexo deploy # 执行部署程序
-        
-    # 以下是云开发的配置
-    - name: Deploy static to Tencent CloudBase
-      id: deployStatic
-      uses: TencentCloudBase/cloudbase-action@v1.1.0
-      env:
-        PERSONAL_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
-        PUBLISH_BRANCH: master
-        PUBLISH_DIR: ./dist
-      with:
-        secretId: ${{ secrets.SECRET_ID }}
-        secretKey: ${{ secrets.SECRET_KEY }}
-        envId: ${{ secrets.ENV_ID }}
-        staticSrcPath: ./public
