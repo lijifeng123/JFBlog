@@ -1,4 +1,4 @@
-ame: Deploy Blog
+name: Deploy Blog
 
 on: [push] # 当有新push时运行
 
