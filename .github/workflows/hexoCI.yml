@@ -1,32 +1,15 @@
-name: hexoCI
-on:
-  push:
-    branches:
-      - hexo
-jobs:
-  build:
-    runs-on: ubuntu-latest
+on: [push]
 
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Tencent Cloudbase Github Action Example
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v1
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Deploy to Tencent CloudBase
+        uses: TencentCloudBase/cloudbase-action@v2.0.1
         with:
-          ref: hexo
-      - name: Use Node.js ${{ matrix.node_version }}
-        uses: actions/setup-node@v1
-        with:
-          version: ${{ matrix.node_version }}
-      - name: Setup hexo
-        env:
-          ACTION_DEPLOY_KEY: ${{ secrets.HEXO_DEPLOY_PRI }}
-        run: |
-          mkdir -p ~/.ssh/
-          echo "$ACTION_DEPLOY_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
-          npm install hexo-cli -g
-          npm install
-      - name: Hexo deploy
-        run: |
-          hexo clean
-          hexo d
+          secretId: ${{secrets.secretId}}
+          secretKey: ${{secrets.secretKey}}
+          envId: ${{secrets.envId}}
