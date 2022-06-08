@@ -4,7 +4,7 @@ date: 2022.5.16
 tags: 技术
 ---
 
-![](https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/avatar.jpg)
+hexo创建发布博客流程
 
 <!--more-->
 
