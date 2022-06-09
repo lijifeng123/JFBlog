@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lijifeng168.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="引言：在我们日常开发中，我们经常遇到指针，同时指针也是C语言里极为重要的一个知识点，今天我们就来把它彻底弄明白。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="理解指针">
+<meta property="og:url" content="https://lijifeng168.com/2022/06/07/%E7%90%86%E8%A7%A3%E6%8C%87%E9%92%88/index.html">
+<meta property="og:site_name" content="Welcome to my blog">
+<meta property="og:description" content="引言：在我们日常开发中，我们经常遇到指针，同时指针也是C语言里极为重要的一个知识点，今天我们就来把它彻底弄明白。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/%E5%86%85%E5%AD%98%E5%88%86%E5%B8%83%E5%9B%BE.png">
+<meta property="article:published_time" content="2022-06-07T07:54:39.000Z">
+<meta property="article:modified_time" content="2022-06-09T08:45:13.077Z">
+<meta property="article:author" content="lijifeng">
+<meta property="article:tag" content="技术">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/%E5%86%85%E5%AD%98%E5%88%86%E5%B8%83%E5%9B%BE.png">
+
+<link rel="canonical" href="https://lijifeng168.com/2022/06/07/%E7%90%86%E8%A7%A3%E6%8C%87%E9%92%88/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>理解指针 | Welcome to my blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Welcome to my blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">文明其精神，野蛮其体魄</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://lijifeng168.com/2022/06/07/%E7%90%86%E8%A7%A3%E6%8C%87%E9%92%88/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/avatar.jpg">
+      <meta itemprop="name" content="lijifeng">
+      <meta itemprop="description" content="个人博客">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Welcome to my blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          理解指针
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 15:54:39" itemprop="dateCreated datePublished" datetime="2022-06-07T15:54:39+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-09 16:45:13" itemprop="dateModified" datetime="2022-06-09T16:45:13+08:00">2022-06-09</time>
+              </span>
+
+          
+            <span id="/2022/06/07/%E7%90%86%E8%A7%A3%E6%8C%87%E9%92%88/" class="post-meta-item leancloud_visitors" data-flag-title="理解指针" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2022/06/07/%E7%90%86%E8%A7%A3%E6%8C%87%E9%92%88/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2022/06/07/%E7%90%86%E8%A7%A3%E6%8C%87%E9%92%88/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h4 id="引言："><a href="#引言：" class="headerlink" title="引言："></a>引言：</h4><p>在我们日常开发中，我们经常遇到指针，同时指针也是C语言里极为重要的一个知识点，今天我们就来把它彻底弄明白。</p>
+<span id="more"></span>
+
+
+
+<h4 id="变量与变量值"><a href="#变量与变量值" class="headerlink" title="变量与变量值:"></a>变量与变量值:</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">//数据类型（int） 变量名（a） = 值（10）</span><br><span class="line">int a = 10;</span><br></pre></td></tr></table></figure>
+
+<p>变量：变量是一个<strong>抽象概念</strong>，可以理解为允许存放数据的空间。当声明一个变量，计算机就会分配空间存放数据。变量可以通过变量名访问。</p>
+<p>变量值：变量里面存储的数据即为变量值，变量值可以为数值、字符等类型。</p>
+<h4 id="指针："><a href="#指针：" class="headerlink" title="指针："></a>指针：</h4><p><strong>指针：</strong>是一种<u>变量</u>，它的值是一个<u>内存地址</u>。（从三个方面分析指针：指针的类型、指针所指向的类型、指针的值）</p>
+<p><strong>指针类型：</strong><code>数据类型 *</code>，int *：整形数据类型的指针； char *： 字符数据类型的指针； void *：无数据类型的指针；等等…</p>
+<p><strong>取地址运算：</strong><code>&amp;变量 </code> ，取得的结果是变量的<strong>首</strong>地址，是一个<u>值</u>（eg：x10db5640）。</p>
+<p><strong>取变量运算：</strong><code>*指针变量</code>，取得的结果是一个变量。</p>
+<p>1.整形数据类型指针：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">- (void)testIntExample&#123;</span><br><span class="line"></span><br><span class="line">		//int类型变量a赋值为10</span><br><span class="line">    int a = 10;</span><br><span class="line">    //int*类型的指针变量b赋值为&amp;a</span><br><span class="line">    int *b = &amp;a;</span><br><span class="line">    //int类型变量c赋值为*b</span><br><span class="line">    int c = *b;</span><br><span class="line">    </span><br><span class="line">    printf(&quot;变量b---值：%d 地址：%p&quot;,*b,b);</span><br><span class="line">    printf(&quot;变量c---值：%d 地址：%p&quot;,c,&amp;c);</span><br><span class="line">    </span><br><span class="line">    打印结果：</span><br><span class="line">    变量b---值：10 地址：0x10db5641c</span><br><span class="line">    变量c---值：10 地址：0x10db5640c</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>解读：指针变量b的类型是：int *，指针变量b所指向的变量类型是int类型，b的值是一个地址：0x10db5641c</p>
+<p>2.字符数据类型指针：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">- (void)testCharExample&#123;</span><br><span class="line"></span><br><span class="line">    char *a = &quot;blog&quot;;</span><br><span class="line">    char *b = a;</span><br><span class="line">    char *c = b;</span><br><span class="line">    </span><br><span class="line">    printf(&quot;变量b所指变量的值：%s 变量b所指变量的首地址：%p 变量b的地址：%p&quot;,b,b,&amp;b);</span><br><span class="line">    printf(&quot;变量c所指变量的值：%s 变量c所指变量的首地址：%p 变量c的地址：%p&quot;,c,c,&amp;c);</span><br><span class="line">    </span><br><span class="line">    打印结果：</span><br><span class="line">		变量b所指变量的值：blog 变量b所指变量的首地址：0x10a951bfc 变量b的地址：0x10a76f410</span><br><span class="line">		变量c所指变量的值：blog 变量c所指变量的首地址：0x10a951bfc 变量c的地址：0x10a76f408</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>3.指针与数组：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">- (void)testArrayExample&#123;</span><br><span class="line">    </span><br><span class="line">    int arr[] = &#123;4,12,34,6,7,788&#125;;</span><br><span class="line">    int *a = arr;//得到的是arr的首地址</span><br><span class="line">    int *b = &amp;arr[0];//得到的是arr数组第一个元素的地址</span><br><span class="line">    int *c = arr + 1;//得到的是arr数组第二个元素的地址</span><br><span class="line">    int *d = &amp;arr[0] + 1;//得到的是arr数组第二个元素的地址</span><br><span class="line"></span><br><span class="line">    printf(&quot;a:%p---b:%p&quot;,a,b);//可以得出a和b是相等的</span><br><span class="line">    printf(&quot;c:%p---d:%p&quot;,c,d);//可以得出c和d是相等的</span><br><span class="line">    printf(&quot;num:%ld&quot;,c-a);//可以得出c和a之间有几个元素</span><br><span class="line">    printf(&quot;数组中第一个元素的字节数：%ld&quot;,sizeof(arr[0]));//获取数组第一个元素的字节数</span><br><span class="line">    </span><br><span class="line">    *c = 99;</span><br><span class="line">    printf(&quot;arr+1: %d---%p&quot;,*c,c);</span><br><span class="line"></span><br><span class="line">    //打印结果：</span><br><span class="line">    a:0x106f54410---b:0x106f54410</span><br><span class="line">    c:0x106f54414---d:0x106f54414</span><br><span class="line">    num:1</span><br><span class="line">    数组中第一个元素的字节数：4</span><br><span class="line">    arr+1: 99---0x106f54414</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>解读：</p>
+<p>1）arr 表示arr[]数组的首地址</p>
+<p>2）指针c-指针a，能获取到两个指针之间有几个元素</p>
+<p>3）指针变量加减一个整数,p(指针)(+/-)n(整数)计算方式为：指针地址 (+/-) n * 变量占有的字节数</p>
+<p>4）sizeof的用法：</p>
+<ul>
+<li>每种类型的数据在内存单元中占有的字节数是固定的,因此sizeof(arr)/sizeof(arr[0]) = 数组的元素的个数</li>
+<li>sizeof(arr)：获取的是数组总共占有多少字节</li>
+<li>sizeof(arr[0])：获取的是数组中一个元素占有的字节数</li>
+</ul>
+<p>5）数组变量保存的是地址,但数组变量中保存的地址是不能改变的,注意说的是指针地址不能变,但是指针指向的值是可以变的,因此数组变量应称为指针常量，可以改变数组中地址中存储的值。</p>
+<h4 id="OC-应用场景示例："><a href="#OC-应用场景示例：" class="headerlink" title="OC 应用场景示例："></a>OC 应用场景示例：</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">//采用这种方式传参，可以获取到error的值</span><br><span class="line">- (void)testErrorExample&#123;</span><br><span class="line"></span><br><span class="line">    NSError *err = nil;</span><br><span class="line">    [self handleResponseCode:400 error:&amp;err];</span><br><span class="line">    </span><br><span class="line">    NSLog(@&quot;err---%p--%@&quot;,err,err);</span><br><span class="line">    </span><br><span class="line">    //指针运算符&amp;和*是从右往左运算,他们的优先级相同。*&amp;err和err一样。</span><br><span class="line">    NSLog(@&quot;*&amp;err---%p--%@&quot;,*&amp;err,*&amp;err);</span><br><span class="line">    </span><br><span class="line">    //打印结果</span><br><span class="line">    err---0x6000031d07e0--Error Domain=NSCocoaErrorDomain Code=100 &quot;(null)&quot; UserInfo=&#123;data=99&#125;</span><br><span class="line">    *&amp;err---0x6000031d07e0--Error Domain=NSCocoaErrorDomain Code=100 &quot;(null)&quot; UserInfo=&#123;data=99&#125;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (void)handleResponseCode:(NSInteger)code error:(NSError **)error&#123;</span><br><span class="line">    if (code != 0) &#123;</span><br><span class="line">        *error = [NSError errorWithDomain:NSCocoaErrorDomain code:100 userInfo:@&#123;@&quot;data&quot;:@&quot;99&quot;&#125;];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h4><ol>
+<li><p>操作系统分为32位和64位,32位的最多只能支持4GB的内存,因为计算机底层并不使用十进制，使用的是二进制，32位的二进制只能支持4G个编号,这意味着操作系统只能为4GB的内存单元编号，因此32位的操作系统最多只能支持4GB的内存,多余的内存不会有编号,因此无法将数据存入这些内存单元中。</p>
+</li>
+<li><pre><code>//64位操作系统演示
+-(void)testGetPointerNumP&#123;
+    
+    char *a = &quot;myBlog&quot;;
+    int b = 1234325;
+    double c = 3232.434;
+    printf(&quot;a的值所占字节数：%ld&quot;,sizeof(&amp;a));
+    printf(&quot;b的值所占字节数：%ld&quot;,sizeof(&amp;b));
+    printf(&quot;c的值所占字节数：%ld&quot;,sizeof(&amp;c));
+    
+    //打印结果
+    a的值所占字节数：8
+    b的值所占字节数：8
+    c的值所占字节数：8
+&#125;
+</code></pre>
+<p>指针存在于栈区，不同数据类型的指针大小都相等，因为他们的值都是一个地址，并且长度也相同。32位操作系统中，指针大小是4个字节，64位操作系统中指针大小是8个字节。</p>
+</li>
+<li><p>内存与地址分布图：</p>
+</li>
+</ol>
+<p><img src="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/%E5%86%85%E5%AD%98%E5%88%86%E5%B8%83%E5%9B%BE.png" alt="内存分布图"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%8A%80%E6%9C%AF/" rel="tag"># 技术</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/05/16/hello-world/" rel="prev" title="Hello World">
+      <i class="fa fa-chevron-left"></i> Hello World
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BC%95%E8%A8%80%EF%BC%9A"><span class="nav-number">1.</span> <span class="nav-text">引言：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%98%E9%87%8F%E4%B8%8E%E5%8F%98%E9%87%8F%E5%80%BC"><span class="nav-number">2.</span> <span class="nav-text">变量与变量值:</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8C%87%E9%92%88%EF%BC%9A"><span class="nav-number">3.</span> <span class="nav-text">指针：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#OC-%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="nav-number">4.</span> <span class="nav-text">OC 应用场景示例：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%89%A9%E5%B1%95"><span class="nav-number">5.</span> <span class="nav-text">扩展</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="lijifeng"
+      src="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/avatar.jpg">
+  <p class="site-author-name" itemprop="name">lijifeng</p>
+  <div class="site-description" itemprop="description">个人博客</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">2</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://carlwe.com/" title="https:&#x2F;&#x2F;carlwe.com&#x2F;" rel="noopener" target="_blank">carlwe</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lijifeng</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : true,
+      appId      : 'bWi6klBzJ94DAMDz2tR3Q4V4-gzGzoHsz',
+      appKey     : 'bkDWqUctHShLgDzsCF9n70Fx',
+      placeholder: "发表一下你的看法",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : 'zh-cn' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
