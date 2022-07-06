@@ -27,10 +27,16 @@
 <meta property="og:site_name" content="Welcome to my blog">
 <meta property="og:description" content="一、定时器的循环引入 二、copy、mutableCopy 三、创建大量autorelease对象时，最好自己创建一个@autoreleasepool {} 四、其他注意事项">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/20220706111435.png">
+<meta property="og:image" content="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/20220706111630.png">
+<meta property="og:image" content="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/20220706112314.png">
+<meta property="og:image" content="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/20220706112417.png">
+<meta property="og:image" content="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/20220706112543.png">
 <meta property="article:published_time" content="2022-07-05T09:32:38.000Z">
-<meta property="article:modified_time" content="2022-07-05T11:02:56.421Z">
+<meta property="article:modified_time" content="2022-07-06T06:02:40.732Z">
 <meta property="article:author" content="lijifeng">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/20220706111435.png">
 
 <link rel="canonical" href="https://lijifeng168.com/2022/07/05/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%BA%8C/">
 
@@ -183,10 +189,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2022-07-05 17:32:38 / 修改时间：19:02:56" itemprop="dateCreated datePublished" datetime="2022-07-05T17:32:38+08:00">2022-07-05</time>
+              <time title="创建时间：2022-07-05 17:32:38" itemprop="dateCreated datePublished" datetime="2022-07-05T17:32:38+08:00">2022-07-05</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-07-06 14:02:40" itemprop="dateModified" datetime="2022-07-06T14:02:40+08:00">2022-07-06</time>
+              </span>
 
           
             <span id="/2022/07/05/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%BA%8C/" class="post-meta-item leancloud_visitors" data-flag-title="内存管理二" title="阅读次数">
@@ -234,6 +246,34 @@
 
 <figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="string">&quot;ViewController1.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ViewController1</span> ()</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) <span class="built_in">NSTimer</span> *timer;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">ViewController1</span></span></span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)viewDidLoad &#123;</span><br><span class="line">    [<span class="variable language_">super</span> viewDidLoad];</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 创建timer</span></span><br><span class="line">    <span class="keyword">self</span>.timer = [<span class="built_in">NSTimer</span> scheduledTimerWithTimeInterval:<span class="number">1</span> target:<span class="keyword">self</span> selector:<span class="keyword">@selector</span>(test) userInfo:<span class="literal">nil</span> repeats:<span class="literal">YES</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)test &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;11&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)dealloc &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;%s&quot;</span>, __func__);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 退出界面时，使timer失效从而销毁</span></span><br><span class="line">    [<span class="keyword">self</span>.timer invalidate];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
 
+<p>运行代码，点击<code>ViewController</code>进入<code>ViewController1</code>，此时<code>timer</code>跑起来了，每隔1秒打印一次“11”。此时点击返回按钮，返回<code>ViewController</code>，正常情况下<code>ViewController1</code>应该会销毁，并触发<code>dealloc</code>方法，<code>timer</code>也跟着失效并且销毁。但实际情况却是<code>ViewController1</code>没有销毁，也没有触发<code>dealloc</code>方法，<code>timer</code>还一直跑着，这是因为<code>timer</code>和<code>ViewController1</code>形成了循环引用，导致内存泄漏。</p>
+<p>查看<code>timer</code>的创建方法，可以知道：**<code>timer</code>会强引用<code>target</code>，**也就是说<code>timer</code>确实强引用着<code>ViewController1</code>。</p>
+<p><img src="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/20220706111435.png" alt="creatTimer"></p>
+<p>而<code>ViewController</code>又强引用着<code>timer</code>。</p>
+<p><img src="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/20220706111630.png" alt="img"></p>
+<p>那怎么打破<code>NSTimer</code>的循环引用呢？我们知道<code>__weak</code>是专门用来打破循环引用的，那它是不是也能打破<code>NSTimer</code>的循环引用？</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="type">void</span>)viewDidLoad &#123;</span><br><span class="line">    [<span class="variable language_">super</span> viewDidLoad];</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 尝试用__weak打破NSTimer的循环引用</span></span><br><span class="line">    __<span class="keyword">weak</span> <span class="keyword">typeof</span>(<span class="keyword">self</span>) weakSelf = <span class="keyword">self</span>;</span><br><span class="line">    <span class="keyword">self</span>.timer = [<span class="built_in">NSTimer</span> scheduledTimerWithTimeInterval:<span class="number">1</span> target:weakSelf selector:<span class="keyword">@selector</span>(test) userInfo:<span class="literal">nil</span> repeats:<span class="literal">YES</span>];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行，发现没有效果，那为什么<code>__weak</code>不能打破<code>NSTimer</code>的循环引用？毫无疑问<code>__weak</code>的确是把<code>self</code>搞成了弱指针，但因为<code>NSTimer</code>内部有一个强指针类型的<code>target</code>变量</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) <span class="type">id</span> target;</span><br></pre></td></tr></table></figure>
+
+<p>来接收这个传进来的地址值，所以无论你外界是传进来强指针还是弱指针，它内部都是一个强指针接收，就总是会强引用<code>target</code>，所以用<code>__weak</code>不能打破<code>NSTimer</code>的循环引用。</p>
+<p>那再试试另一条引用线吧，让<code>ViewController1</code>弱引用<code>timer</code>。</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ViewController1</span> ()</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 尝试用weak修饰timer来打破NSTimer的循环引用</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">weak</span>) <span class="built_in">NSTimer</span> *timer;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<p>运行，发现没有效果，奇了怪了，怎么回事呢？查看官方对<code>NSTimer</code>的说明，可以知道：<strong>把<code>timer</code>添加到RunLoop之后，RunLoop会强引用<code>timer</code>，并且建议我们不必自己强引用<code>timer</code>，而解除RunLoop对<code>timer</code>强引用的唯一方式就是调用<code>timer</code>的<code>invalidate</code>方法使<code>timer</code>失效从而销毁。</strong></p>
+<p><img src="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/20220706112314.png" alt="img"></p>
+<p><img src="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/20220706112417.png" alt="img"></p>
+<p>也就是说，实际的引用关系如下：</p>
+<p><img src="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/20220706112543.png" alt="img"></p>
+<p>所以我们<strong>使用<code>weak</code>修饰<code>timer</code>是正确的，</strong>但这还是不能打破<code>NSTimer</code>的循环引用——更准确地说，这可以解决<code>NSTimer</code>的循环引用，但还是没有解决<code>NSTimer</code>内存泄漏的问题。因为<code>[self.timer invalidate]</code>的调用——即<code>timer</code>的销毁——最好就是发生在<code>ViewController1</code>销毁时，而<code>ViewController1</code>要想销毁就必须得<code>timer</code>先销毁，还是内存泄漏。</p>
+<p>倒腾来倒腾去，还是得<strong>从<code>timer</code>强引用<code>target</code>这条引用线下手，把它搞成弱引用，<code>__weak</code>不起作用，那我们想想别的方案呗。</strong></p>
+<h4 id="2、打破NSTimer的循环引用"><a href="#2、打破NSTimer的循环引用" class="headerlink" title="2、打破NSTimer的循环引用"></a>2、打破<code>NSTimer</code>的循环引用</h4><ul>
+<li>方案一：使用block的方式创建<code>timer</code></li>
+</ul>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="type">void</span>)viewDidLoad &#123;</span><br><span class="line">    [<span class="variable language_">super</span> viewDidLoad];</span><br><span class="line"></span><br><span class="line">    __<span class="keyword">weak</span> <span class="keyword">typeof</span>(<span class="keyword">self</span>) weakSelf = <span class="keyword">self</span>;</span><br><span class="line">    <span class="keyword">self</span>.timer = [<span class="built_in">NSTimer</span> scheduledTimerWithTimeInterval:<span class="number">1</span> repeats:<span class="literal">YES</span> block:^(<span class="built_in">NSTimer</span> * _Nonnull timer) &#123;</span><br><span class="line">        </span><br><span class="line">        [weakSelf test];</span><br><span class="line">    &#125;];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>为什么能解决呢？因为此时<code>timer</code>是强引用block的，而<code>__weak</code>可以打破block的循环引用，所以block是弱引用<code>self</code>的，所以最终的效果就类似于<code>timer</code>弱引用<code>self</code>。解决是能解决，但用这种方式创建<code>timer</code>要iOS10.0以后才能使用。</p>
 
     </div>
 
@@ -252,7 +292,10 @@
     <a href="/2022/06/22/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%B8%80/" rel="prev" title="内存管理一">
       <i class="fa fa-chevron-left"></i> 内存管理一
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2022/07/06/%E3%80%90Runtime%E7%B3%BB%E5%88%97%E3%80%91Runtime%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F/" rel="next" title="【Runtime系列】一、Runtime是什么？">
+      【Runtime系列】一、Runtime是什么？ <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -312,7 +355,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%AE%9A%E6%97%B6%E5%99%A8%E7%9A%84%E5%BE%AA%E7%8E%AF%E5%BC%95%E5%85%A5"><span class="nav-number">1.</span> <span class="nav-text">一、定时器的循环引入</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-NSTimer%E7%9A%84%E5%BE%AA%E7%8E%AF%E5%BC%95%E5%85%A5"><span class="nav-number">1.1.</span> <span class="nav-text">1.NSTimer的循环引入</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%AE%9A%E6%97%B6%E5%99%A8%E7%9A%84%E5%BE%AA%E7%8E%AF%E5%BC%95%E5%85%A5"><span class="nav-number">1.</span> <span class="nav-text">一、定时器的循环引入</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-NSTimer%E7%9A%84%E5%BE%AA%E7%8E%AF%E5%BC%95%E5%85%A5"><span class="nav-number">1.1.</span> <span class="nav-text">1.NSTimer的循环引入</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%E3%80%81%E6%89%93%E7%A0%B4NSTimer%E7%9A%84%E5%BE%AA%E7%8E%AF%E5%BC%95%E7%94%A8"><span class="nav-number">1.2.</span> <span class="nav-text">2、打破NSTimer的循环引用</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -328,7 +371,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-count">5</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
