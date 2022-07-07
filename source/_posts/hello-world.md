@@ -1,5 +1,7 @@
 ---
 title: Hello World
+date: 2015-06-22
+tags: 博客
 ---
 
 hexo创建发布博客流程
