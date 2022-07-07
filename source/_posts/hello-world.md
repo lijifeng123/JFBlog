@@ -1,7 +1,5 @@
 ---
 title: Hello World
-date: 2022.5.16
-tags: 技术
 ---
 
 hexo创建发布博客流程
