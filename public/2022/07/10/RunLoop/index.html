@@ -20,30 +20,35 @@
     var CONFIG = {"hostname":"lijifeng168.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="个人博客">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Welcome to my blog">
-<meta property="og:url" content="https://lijifeng168.com/index.html">
+  <meta name="description" content="一、RunLoop是什么 二、RunLoop的底层实现 ​        1、RunLoop和线程是什么关系 ​        2、RunLoop的运行模式 ​        3、Source0事件源、Source1事件源、Observer、Timer事件源 三、RunLoop的运行流程 四、RunLoop的实际应用 ​        1、处理NSTimer不工作的问题 ​        2、常">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RunLoop">
+<meta property="og:url" content="https://lijifeng168.com/2022/07/10/RunLoop/index.html">
 <meta property="og:site_name" content="Welcome to my blog">
-<meta property="og:description" content="个人博客">
+<meta property="og:description" content="一、RunLoop是什么 二、RunLoop的底层实现 ​        1、RunLoop和线程是什么关系 ​        2、RunLoop的运行模式 ​        3、Source0事件源、Source1事件源、Observer、Timer事件源 三、RunLoop的运行流程 四、RunLoop的实际应用 ​        1、处理NSTimer不工作的问题 ​        2、常">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/1140.png">
+<meta property="article:published_time" content="2022-07-10T11:11:38.000Z">
+<meta property="article:modified_time" content="2022-07-11T03:12:51.793Z">
 <meta property="article:author" content="lijifeng">
+<meta property="article:tag" content="RunLoop">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/1140.png">
 
-<link rel="canonical" href="https://lijifeng168.com/">
+<link rel="canonical" href="https://lijifeng168.com/2022/07/10/RunLoop/">
 
 
 <script id="page-configurations">
   // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
-    isHome : true,
-    isPost : false,
+    isHome : false,
+    isPost : true,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>Welcome to my blog</title>
+  <title>RunLoop | Welcome to my blog</title>
   
 
 
@@ -152,9 +157,10 @@
         <div class="content-wrap">
           
 
-          <div class="content index posts-expand">
+          <div class="content post posts-expand">
             
-      
+
+    
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
@@ -170,10 +176,9 @@
       <meta itemprop="name" content="Welcome to my blog">
     </span>
       <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/07/10/RunLoop/" class="post-title-link" itemprop="url">RunLoop</a>
-        </h2>
+        <h1 class="post-title" itemprop="name headline">
+          RunLoop
+        </h1>
 
         <div class="post-meta">
             <span class="post-meta-item">
@@ -224,7 +229,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <blockquote>
+        <blockquote>
 <p>一、RunLoop是什么</p>
 <p>二、RunLoop的底层实现</p>
 <p>​        1、RunLoop和线程是什么关系</p>
@@ -279,494 +284,40 @@
 </li>
 </ul>
 
-      
     </div>
 
     
     
     
+
       <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
+          <div class="post-tags">
+              <a href="/tags/RunLoop/" rel="tag"># RunLoop</a>
+          </div>
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://lijifeng168.com/2022/07/06/Runtime%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/avatar.jpg">
-      <meta itemprop="name" content="lijifeng">
-      <meta itemprop="description" content="个人博客">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Welcome to my blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/07/06/Runtime%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F/" class="post-title-link" itemprop="url">一、Runtime是什么？</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-07-06 14:30:48" itemprop="dateCreated datePublished" datetime="2022-07-06T14:30:48+08:00">2022-07-06</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-07-07 11:22:40" itemprop="dateModified" datetime="2022-07-07T11:22:40+08:00">2022-07-07</time>
-              </span>
-
-          
-            <span id="/2022/07/06/Runtime%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F/" class="post-meta-item leancloud_visitors" data-flag-title="一、Runtime是什么？" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/2022/07/06/Runtime%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2022/07/06/Runtime%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://lijifeng168.com/2022/07/05/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%BA%8C/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/avatar.jpg">
-      <meta itemprop="name" content="lijifeng">
-      <meta itemprop="description" content="个人博客">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Welcome to my blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/07/05/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%BA%8C/" class="post-title-link" itemprop="url">内存管理二</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-07-05 17:32:38" itemprop="dateCreated datePublished" datetime="2022-07-05T17:32:38+08:00">2022-07-05</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-07-07 14:53:39" itemprop="dateModified" datetime="2022-07-07T14:53:39+08:00">2022-07-07</time>
-              </span>
-
-          
-            <span id="/2022/07/05/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%BA%8C/" class="post-meta-item leancloud_visitors" data-flag-title="内存管理二" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/2022/07/05/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%BA%8C/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2022/07/05/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%BA%8C/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <blockquote>
-<p>一、定时器的循环引入</p>
-<p>二、copy、mutableCopy</p>
-<p>三、创建大量autorelease对象时，最好自己创建一个@autoreleasepool {}</p>
-<p>四、其他注意事项</p>
-</blockquote>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/07/05/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%BA%8C/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
         
-      
-    </div>
 
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://lijifeng168.com/2022/06/22/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%B8%80/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/avatar.jpg">
-      <meta itemprop="name" content="lijifeng">
-      <meta itemprop="description" content="个人博客">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Welcome to my blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/22/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%B8%80/" class="post-title-link" itemprop="url">内存管理一</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-22 14:18:11" itemprop="dateCreated datePublished" datetime="2022-06-22T14:18:11+08:00">2022-06-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-07-07 15:26:21" itemprop="dateModified" datetime="2022-07-07T15:26:21+08:00">2022-07-07</time>
-              </span>
-
-          
-            <span id="/2022/06/22/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%B8%80/" class="post-meta-item leancloud_visitors" data-flag-title="内存管理一" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/2022/06/22/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%B8%80/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2022/06/22/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%B8%80/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <blockquote>
-<p>一、iOS内存管理方式：</p>
-<p>​    1.Tagged Pointer：小对象的内存管理方式</p>
-<p>​    2.引用计数：普通对象的内存管理方式</p>
-<p>二、MRC介绍，需要开发工程师做哪些工作</p>
-<p>三、ARC介绍，编译器帮我们做了什么</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/06/22/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%B8%80/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
         
-      
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/07/06/Runtime%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F/" rel="prev" title="一、Runtime是什么？">
+      <i class="fa fa-chevron-left"></i> 一、Runtime是什么？
+    </a></div>
+      <div class="post-nav-item"></div>
     </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
       </footer>
+    
   </article>
   
   
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://lijifeng168.com/2022/06/07/%E7%90%86%E8%A7%A3%E6%8C%87%E9%92%88/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/avatar.jpg">
-      <meta itemprop="name" content="lijifeng">
-      <meta itemprop="description" content="个人博客">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Welcome to my blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/%E7%90%86%E8%A7%A3%E6%8C%87%E9%92%88/" class="post-title-link" itemprop="url">理解指针</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 15:54:39" itemprop="dateCreated datePublished" datetime="2022-06-07T15:54:39+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-07-07 11:22:19" itemprop="dateModified" datetime="2022-07-07T11:22:19+08:00">2022-07-07</time>
-              </span>
-
-          
-            <span id="/2022/06/07/%E7%90%86%E8%A7%A3%E6%8C%87%E9%92%88/" class="post-meta-item leancloud_visitors" data-flag-title="理解指针" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/2022/06/07/%E7%90%86%E8%A7%A3%E6%8C%87%E9%92%88/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2022/06/07/%E7%90%86%E8%A7%A3%E6%8C%87%E9%92%88/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="一、引言："><a href="#一、引言：" class="headerlink" title="一、引言："></a>一、引言：</h3><p>日常开发中，我们经常遇到指针，同时指针也是C语言里极为重要的一个知识点，今天我们就来把它彻底弄明白。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/06/07/%E7%90%86%E8%A7%A3%E6%8C%87%E9%92%88/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://lijifeng168.com/2015/06/22/hello-world/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/avatar.jpg">
-      <meta itemprop="name" content="lijifeng">
-      <meta itemprop="description" content="个人博客">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Welcome to my blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2015/06/22/hello-world/" class="post-title-link" itemprop="url">Hello World</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2015-06-22 00:00:00" itemprop="dateCreated datePublished" datetime="2015-06-22T00:00:00+08:00">2015-06-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-07-07 15:31:23" itemprop="dateModified" datetime="2022-07-07T15:31:23+08:00">2022-07-07</time>
-              </span>
-
-          
-            <span id="/2015/06/22/hello-world/" class="post-meta-item leancloud_visitors" data-flag-title="Hello World" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/2015/06/22/hello-world/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2015/06/22/hello-world/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>hexo创建发布博客流程</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2015/06/22/hello-world/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-
   
 
 
 
           </div>
           
+    <div class="comments" id="valine-comments"></div>
 
 <script>
   window.addEventListener('tabs:register', () => {
@@ -813,6 +364,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81RunLoop%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">1.</span> <span class="nav-text">一、RunLoop是什么</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E3%80%81RunLoop%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.</span> <span class="nav-text">二、RunLoop的底层实现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1%E3%80%81RunLoop%E5%92%8C%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="nav-number">2.1.</span> <span class="nav-text">1、RunLoop和线程的关系</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%E3%80%81RunLoop%E7%9A%84%E8%BF%90%E8%A1%8C%E6%A8%A1%E5%BC%8F"><span class="nav-number">2.2.</span> <span class="nav-text">2、RunLoop的运行模式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3%E3%80%81Source0%E4%BA%8B%E4%BB%B6%E6%BA%90%E3%80%81Source1%E4%BA%8B%E4%BB%B6%E6%BA%90%E3%80%81Observer%E3%80%81Timer%E4%BA%8B%E4%BB%B6%E6%BA%90"><span class="nav-number">2.3.</span> <span class="nav-text">3、Source0事件源、Source1事件源、Observer、Timer事件源</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#Source0%E4%BA%8B%E4%BB%B6%E6%BA%90%EF%BC%9A"><span class="nav-number">2.3.0.1.</span> <span class="nav-text">Source0事件源：</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#Source0%E4%BA%8B%E4%BB%B6%E6%BA%90%E4%B8%BB%E8%A6%81%E5%8C%85%E6%8B%AC%E5%8E%9F%E5%A7%8B%E6%8C%87%E9%92%88%E4%BA%8B%E4%BB%B6%E3%80%81%E6%89%8B%E5%8A%BF%E4%BA%8B%E4%BB%B6%E3%80%81performSelector-onThread-%E7%AD%89%E4%BA%8B%E4%BB%B6%EF%BC%8C%E8%BF%99%E4%BA%9B%E4%BA%8B%E4%BB%B6%E9%83%BD%E6%98%AF%E6%88%91%E4%BB%AC%E7%94%A8%E4%BB%A3%E7%A0%81%E5%86%99%E7%9A%84%E3%80%82"><span class="nav-number">2.3.0.2.</span> <span class="nav-text">Source0事件源主要包括原始指针事件、手势事件、performSelector:onThread:等事件，这些事件都是我们用代码写的。</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#Source1%E4%BA%8B%E4%BB%B6%E6%BA%90%EF%BC%9A"><span class="nav-number">2.3.0.3.</span> <span class="nav-text">Source1事件源：</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#Observer%EF%BC%9A"><span class="nav-number">2.3.0.4.</span> <span class="nav-text">Observer：</span></a></li></ol></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
