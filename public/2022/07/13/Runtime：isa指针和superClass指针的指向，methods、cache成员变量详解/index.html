@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lijifeng168.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="一、对象、类、元类的isa指针和superClass指针指向讲解 二、类、元类的methods成员变量详解 三、类、元类的cache成员变量详解">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Runtime：isa指针和superClass指针的指向，methods、cache成员变量详解">
+<meta property="og:url" content="https://lijifeng168.com/2022/07/13/Runtime%EF%BC%9Aisa%E6%8C%87%E9%92%88%E5%92%8CsuperClass%E6%8C%87%E9%92%88%E7%9A%84%E6%8C%87%E5%90%91%EF%BC%8Cmethods%E3%80%81cache%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E8%AF%A6%E8%A7%A3/index.html">
+<meta property="og:site_name" content="Welcome to my blog">
+<meta property="og:description" content="一、对象、类、元类的isa指针和superClass指针指向讲解 二、类、元类的methods成员变量详解 三、类、元类的cache成员变量详解">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/1200-20220713203040874.png">
+<meta property="og:image" content="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/937.png">
+<meta property="og:image" content="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/1200-20220714114122326.png">
+<meta property="article:published_time" content="2022-07-13T12:12:53.000Z">
+<meta property="article:modified_time" content="2022-07-14T04:39:39.890Z">
+<meta property="article:author" content="lijifeng">
+<meta property="article:tag" content="Runtime系列">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/1200-20220713203040874.png">
+
+<link rel="canonical" href="https://lijifeng168.com/2022/07/13/Runtime%EF%BC%9Aisa%E6%8C%87%E9%92%88%E5%92%8CsuperClass%E6%8C%87%E9%92%88%E7%9A%84%E6%8C%87%E5%90%91%EF%BC%8Cmethods%E3%80%81cache%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E8%AF%A6%E8%A7%A3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Runtime：isa指针和superClass指针的指向，methods、cache成员变量详解 | Welcome to my blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Welcome to my blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">文明其精神，野蛮其体魄</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://lijifeng168.com/2022/07/13/Runtime%EF%BC%9Aisa%E6%8C%87%E9%92%88%E5%92%8CsuperClass%E6%8C%87%E9%92%88%E7%9A%84%E6%8C%87%E5%90%91%EF%BC%8Cmethods%E3%80%81cache%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E8%AF%A6%E8%A7%A3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/avatar.jpg">
+      <meta itemprop="name" content="lijifeng">
+      <meta itemprop="description" content="个人博客">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Welcome to my blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Runtime：isa指针和superClass指针的指向，methods、cache成员变量详解
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-07-13 20:12:53" itemprop="dateCreated datePublished" datetime="2022-07-13T20:12:53+08:00">2022-07-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-07-14 12:39:39" itemprop="dateModified" datetime="2022-07-14T12:39:39+08:00">2022-07-14</time>
+              </span>
+
+          
+            <span id="/2022/07/13/Runtime%EF%BC%9Aisa%E6%8C%87%E9%92%88%E5%92%8CsuperClass%E6%8C%87%E9%92%88%E7%9A%84%E6%8C%87%E5%90%91%EF%BC%8Cmethods%E3%80%81cache%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E8%AF%A6%E8%A7%A3/" class="post-meta-item leancloud_visitors" data-flag-title="Runtime：isa指针和superClass指针的指向，methods、cache成员变量详解" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2022/07/13/Runtime%EF%BC%9Aisa%E6%8C%87%E9%92%88%E5%92%8CsuperClass%E6%8C%87%E9%92%88%E7%9A%84%E6%8C%87%E5%90%91%EF%BC%8Cmethods%E3%80%81cache%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E8%AF%A6%E8%A7%A3/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2022/07/13/Runtime%EF%BC%9Aisa%E6%8C%87%E9%92%88%E5%92%8CsuperClass%E6%8C%87%E9%92%88%E7%9A%84%E6%8C%87%E5%90%91%EF%BC%8Cmethods%E3%80%81cache%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E8%AF%A6%E8%A7%A3/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><img src="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/1200-20220713203040874.png" alt="img"></p>
+<blockquote>
+<p>一、对象、类、元类的<code>isa</code>指针和<code>superClass</code>指针指向讲解</p>
+<p>二、类、元类的<code>methods</code>成员变量详解</p>
+<p>三、类、元类的<code>cache</code>成员变量详解</p>
+</blockquote>
+<span id="more"></span>
+
+<h3 id="一、对象、类、元类的isa指针和superClass指针指向讲解"><a href="#一、对象、类、元类的isa指针和superClass指针指向讲解" class="headerlink" title="一、对象、类、元类的isa指针和superClass指针指向讲解"></a>一、对象、类、元类的<code>isa</code>指针和<code>superClass</code>指针指向讲解</h3><p><img src="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/937.png" alt="img"></p>
+<p><code>isa</code>指针和<code>superclass</code>指针是两个非常重要的指针，弄清它俩的指向有助于我们理解很多东西。</p>
+<p>概括地说：**<code>isa</code>指针指向它所属的类，<code>superclass</code>指针指向它的父类。**</p>
+<p>具体地说：</p>
+<ul>
+<li><strong>实例对象的<code>isa</code>指针指向它所属的类，类的<code>isa</code>指针指向它的元类，元类的<code>isa</code>指针指向基类的元类，基类的元类的<code>isa</code>指针指向它自己。</strong>（<code>isa</code>指针体系中基类的元类是终结）</li>
+<li><strong>子类的<code>superclass</code>指针指向它的父类，这样一层一层往上直到基类，基类的<code>superclass</code>指针为<code>nil</code>；子元类的<code>superclass</code>指针指向父元类，这样一层一层往上直到基类的元类，基类的元类的<code>superclass</code>指针指向基类。</strong>（<code>superclass</code>指针体系中<code>nil</code>是终结）</li>
+</ul>
+<h3 id="二、类、元类的methonds成员变量详解"><a href="#二、类、元类的methonds成员变量详解" class="headerlink" title="二、类、元类的methonds成员变量详解"></a>二、类、元类的<code>methonds</code>成员变量详解</h3><p><img src="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/1200-20220714114122326.png" alt="img"></p>
+<p>我们知道了类的<code>methods</code>成员变量存储着该类所有的实例方法信息，那它到底是怎么存储的？类的<code>methods</code>成员变量其实是一个数组指针，也就是说<code>methods</code>成员变量里存储着一个地址，只占了8个字节，指向一个数组。而这个数组又是一个指针数组，这个数组的大小要看这个类有几个分类，假设有N个分类，那么它就占了(N + 1) * 8个字节，也就是说这个数组里存储着一堆地址，分别指向真正的实例方法列表，这些实例方法列表包括分类2的实例方法列表、分类1的实例方法列表、类本身的实例方法列表等等，方法列表里才存放着一个一个的实例方法<code>method_t</code>，一个<code>method_t</code>结构体里有3个指针，所以它占用了24个字节，这些内存都是在静态全局区的，它们的大小其实占不了多少，一个App真正占用内存的是我们用这些类<code>alloc init</code>出来的一个个对象，还有图片资源。元类的<code>methods</code>成员变量也是一样的存储方式，只不过里面存储的是该类所有的类方法信息。</p>
+<p>通过查看Runtime的源码（<code>objc-runtime-new.h</code>文件），我们得到方法的定义如下（伪代码）：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">method_t</span> &#123;</span><br><span class="line">    SEL name;</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *types;</span><br><span class="line">    IMP imp;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">method_t</span> *Method; <span class="comment">// Method类型的本质就是一个method_t类型的结构体指针，所以它可以指向任意一个OC方法</span></span><br></pre></td></tr></table></figure>
+
+<p>可见方法的本质就是一个<code>method_t</code>类型的结构体，该结构体内部有三个成员变量：</p>
+<ul>
+<li><p><code>SEL</code>：<strong>方法选择器，跟方法名一一对应，是一个方法的唯一标识，我们直接把它当作方法名来看待就行</strong>，可以通过<code>@selector(方法名)</code>、<code>NSSelectorFromString(@&quot;方法名的OC字符串&quot;)</code>、<code>sel_registerName(&quot;方法名的C字符串&quot;)</code>来获取方法选择器；</p>
+</li>
+<li><p><code>types</code>：<strong>类型编码字符串，包含了方法的参数和返回值信息</strong>，这里是<a target="_blank" rel="noopener" href="https://links.jianshu.com/go?to=https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Articles/ocrtTypeEncodings.html">类型编码对照表</a>，类型编码中第一个字母代表该方法的返回值类型，后面的字母依次代表该方法的各个参数类型；第一个数字代表该方法所有参数占用内存的总大小，后面的数字依次代表该方法各个参数的内存地址距离内存首地址的偏移量；</p>
+</li>
+<li><p><code>IMP</code>：<strong>函数指针，存储着一个地址，只想该方法在代码区的具体实现。</strong></p>
+</li>
+</ul>
+<h3 id="三、类、元类的cache成员变量详解"><a href="#三、类、元类的cache成员变量详解" class="headerlink" title="三、类、元类的cache成员变量详解"></a>三、类、元类的<code>cache</code>成员变量详解</h3><p>我们知道一个对象接收到消息，会根据它的<code>isa</code>指针找到他所属的类，然后根据类的<code>methods</code>成员变量找到所有的方法列表，然后依次<strong>遍历</strong>这些方法列表来查找要执行的方法。但实际情况中，一个对象只有一部分方法是常用的，其他的方法很少用到或根本用不到，那如果对象每接收一个消息就要遍历一次所有的方法列表，性能肯定会很差。<strong>类的<code>cache</code>成员变量就是用来解决问题的，对象每调用一个方法，系统就会把这个方法存储到<code>cache</code>中，下次对象调用方法时就会优先去<code>cache</code>中查找，如果找到方法则直接调用，如果找不到才去<code>methods</code>哪里找，这就大大提高了查找效率。而且<code>cache</code>还不是简单地存取方法，它用了散列表，这就使得方法查找的效率更高。</strong></p>
+<p>通过查看Runtime的源码（<code>objc-runtime-new.h</code>文件），我们得到<code>cache</code>的定义如下（伪代码）：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">cache_t</span> &#123;</span><br><span class="line">    <span class="keyword">struct</span> <span class="title class_">bucket_t</span> *_buckets;</span><br><span class="line">    <span class="type">mask_t</span> _mask;</span><br><span class="line">    <span class="type">mask_t</span> _occupied;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">bucket_t</span> &#123;</span><br><span class="line">    SEL _sel;</span><br><span class="line">    IMP _imp;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可见<code>cache</code>的本质就是一个<code>cache_t</code>类型的结构体，该结构体内部有三个成员变量：</p>
+<ul>
+<li><strong><code>_buckets</code>：方法缓存散列表；</strong></li>
+<li><strong><code>_mask</code>：散列表的长度 - 1；</strong></li>
+<li><strong><code>_occupied</code>：已缓存方法的数量。</strong></li>
+</ul>
+<p>散列表中的元素也不直接是方法——<code>method_t</code>，而是一个叫<code>bucket_t</code>的东西，它是用方法的<code>SEL</code>和<code>IMP</code>组成的结构体。（为方便叙述，下文中“方法”即指<code>bucket_t</code>）</p>
+<blockquote>
+<p>关键词：散列表、表中元素、表中元素唯一标识、散列算法和散列函数、<code>index</code></p>
+<p>散列表（Hash Table，也叫哈希表），就是<strong>把表中元素的唯一标识通过某种算法得到一个<code>index</code>，然后通过这个<code>index</code>直接访问表中元素的一种数据结构，</strong>这样就不用遍历了，因此<strong>可以大大提高数据查找的效率。</strong>实现这个算法的函数叫作散列函数，存储数据的数组叫作散列表（但这个数组不是普通的数组，它的元素可以不连续存储，因此散列表就有可能造成内存的空闲，它是一个<strong>典型的“以空间换时间”</strong>的例子）。<strong>散列表的核心就在于散列算法。</strong></p>
+</blockquote>
+<p>接下来我们就看看苹果是如何实现<code>cache</code>散列表的。</p>
+<ul>
+<li><code>cache</code>散列表的散列算法：</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">unsigned</span> <span class="type">int</span> <span class="title">cache_hash</span><span class="params">(SEL sel, <span class="type">mask_t</span> mask)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (<span class="type">unsigned</span> <span class="type">int</span>)(<span class="type">unsigned</span> <span class="type">long</span>)sel &amp; mask;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可见苹果关于<code>cache</code>散列表的散列算法其实很简单，就是：<strong>用方法的<code>SEL</code> &amp; （散列表的长度 - 1）</strong>，这样就能得到一个<code>index</code>了，我们知道方法的<code>SEL</code>确实是表中元素的唯一标识。</p>
+<ul>
+<li><code>cache</code>散列表处理冲突</li>
+</ul>
+<p>散列表都会存在的一个问题是：<strong>不同的唯一标识经过散列算法后可能得到相同的<code>index</code>，</strong>那这样数据存取就可能出现冲突，怎么处理呢？</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 这里只是读取方法的源码，存储方法也是一样的道理</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">bucket_t</span> * <span class="title">cache_t::find</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 先通过散列算法得到某个元素的index</span></span><br><span class="line">    <span class="type">mask_t</span> begin = <span class="built_in">cache_hash</span>(sel, _mask);</span><br><span class="line"></span><br><span class="line">    <span class="type">mask_t</span> i = begin;</span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (_buckets[i].<span class="built_in">sel</span>() == sel) &#123; <span class="comment">// 然后去读取该index处的元素，如果发现该元素的唯一标识SEL和我们想要读取元素的SEL一样，就表明读对了，直接返回该元素</span></span><br><span class="line">            <span class="keyword">return</span> &amp;_buckets[I];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">while</span> ((i = <span class="built_in">cache_next</span>(i, _mask)) != begin);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">mask_t</span> <span class="title">cache_next</span><span class="params">(<span class="type">mask_t</span> i, <span class="type">mask_t</span> mask)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 否则（index-1），遍历散列表，直到读取到想要的元素</span></span><br><span class="line">    <span class="keyword">return</span> i ? i<span class="number">-1</span> : mask;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可见<code>cache</code>散列表处理冲突的方式为：<strong>index-1，然后遍历散列表，</strong>直到找到空闲的内存来存储方法，或者直到找到我们真正想读取的方法。</p>
+<ul>
+<li><code>cache</code>散列表存取数据</li>
+</ul>
+<p>通过散列算法得到<code>index</code>之后，系统就会把这个方法直接存储到散列表相应的<code>index</code>处，因此这就可能造成内存的空闲。</p>
+<p>而读取方法的时候也是先通过散列算法得到<code>index</code>，直接从相应的<code>index</code>处拿出方法，因此就不用遍历了，大大提高了方法查找的效率。</p>
+<ul>
+<li><code>cache</code>散列表扩容</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">cache_t::expand</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">uint32_t</span> oldCapacity = <span class="built_in">capacity</span>();</span><br><span class="line">    <span class="type">uint32_t</span> newCapacity = oldCapacity * <span class="number">2</span>; <span class="comment">// 两倍扩容</span></span><br><span class="line">    <span class="comment">// 开辟新的散列表</span></span><br><span class="line">    <span class="type">bucket_t</span> *newBuckets = <span class="built_in">allocateBuckets</span>(newCapacity);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 释放旧的散列表，清空所有的方法缓存</span></span><br><span class="line">    <span class="type">bucket_t</span> *oldBuckets = <span class="built_in">buckets</span>();</span><br><span class="line">    <span class="built_in">cache_collect_free</span>(oldBuckets);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>随着散列表缓存的方法越来越多，它的内存可能就不够用了，此时系统会对散列表进行两倍扩容，创建一个新的散列表，释放旧的散列表并清空所有的方法缓存。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Runtime%E7%B3%BB%E5%88%97/" rel="tag"># Runtime系列</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/07/13/Runtime%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F/" rel="prev" title="一、Runtime是什么？">
+      <i class="fa fa-chevron-left"></i> 一、Runtime是什么？
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%AF%B9%E8%B1%A1%E3%80%81%E7%B1%BB%E3%80%81%E5%85%83%E7%B1%BB%E7%9A%84isa%E6%8C%87%E9%92%88%E5%92%8CsuperClass%E6%8C%87%E9%92%88%E6%8C%87%E5%90%91%E8%AE%B2%E8%A7%A3"><span class="nav-number">1.</span> <span class="nav-text">一、对象、类、元类的isa指针和superClass指针指向讲解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E7%B1%BB%E3%80%81%E5%85%83%E7%B1%BB%E7%9A%84methonds%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">二、类、元类的methonds成员变量详解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E7%B1%BB%E3%80%81%E5%85%83%E7%B1%BB%E7%9A%84cache%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E8%AF%A6%E8%A7%A3"><span class="nav-number">3.</span> <span class="nav-text">三、类、元类的cache成员变量详解</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="lijifeng"
+      src="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/avatar.jpg">
+  <p class="site-author-name" itemprop="name">lijifeng</p>
+  <div class="site-description" itemprop="description">个人博客</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://carlwe.com/" title="https:&#x2F;&#x2F;carlwe.com&#x2F;" rel="noopener" target="_blank">carlwe</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lijifeng</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : true,
+      appId      : 'bWi6klBzJ94DAMDz2tR3Q4V4-gzGzoHsz',
+      appKey     : 'bkDWqUctHShLgDzsCF9n70Fx',
+      placeholder: "发表一下你的看法",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : 'zh-cn' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
