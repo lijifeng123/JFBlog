@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lijifeng168.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta property="og:type" content="article">
+<meta property="og:title" content="【Runtime】实际应用">
+<meta property="og:url" content="https://lijifeng168.com/2021/07/17/Runtime%E5%AE%9E%E9%99%85%E5%BA%94%E7%94%A8/index.html">
+<meta property="og:site_name" content="Welcome to my blog">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/1200.png">
+<meta property="og:image" content="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/1200-20220718103622988.png">
+<meta property="og:image" content="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/1200-20220718103636300.png">
+<meta property="og:image" content="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/1200-20220718103750853.png">
+<meta property="og:image" content="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/1200-20220718104234339.png">
+<meta property="og:image" content="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/1008.png">
+<meta property="og:image" content="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/1200-20220718103053060.png">
+<meta property="article:published_time" content="2021-07-17T02:31:53.000Z">
+<meta property="article:modified_time" content="2022-07-18T02:55:25.161Z">
+<meta property="article:author" content="lijifeng">
+<meta property="article:tag" content="Runtime系列">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/1200.png">
+
+<link rel="canonical" href="https://lijifeng168.com/2021/07/17/Runtime%E5%AE%9E%E9%99%85%E5%BA%94%E7%94%A8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>【Runtime】实际应用 | Welcome to my blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Welcome to my blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">文明其精神，野蛮其体魄</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://lijifeng168.com/2021/07/17/Runtime%E5%AE%9E%E9%99%85%E5%BA%94%E7%94%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/avatar.jpg">
+      <meta itemprop="name" content="lijifeng">
+      <meta itemprop="description" content="个人博客">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Welcome to my blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          【Runtime】实际应用
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-07-17 10:31:53" itemprop="dateCreated datePublished" datetime="2021-07-17T10:31:53+08:00">2021-07-17</time>
+            </span>
+
+          
+            <span id="/2021/07/17/Runtime%E5%AE%9E%E9%99%85%E5%BA%94%E7%94%A8/" class="post-meta-item leancloud_visitors" data-flag-title="【Runtime】实际应用" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/07/17/Runtime%E5%AE%9E%E9%99%85%E5%BA%94%E7%94%A8/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/07/17/Runtime%E5%AE%9E%E9%99%85%E5%BA%94%E7%94%A8/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><img src="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/1200.png" alt="img"></p>
+<span id="more"></span>
+
+<blockquote>
+<p>一、利用关联对象给分类添加完整属性</p>
+<p>​    1、分类能添加属性，但不能添加成员变量</p>
+<p>​    2、虽然能添加属性，但添加的是不完整的属性</p>
+<p>​    3、利用关联对象给分类添加完整的属性</p>
+<p>​    4、关联对象的本质</p>
+<p>二、获取一个类所有的成员变量。实现一键归档解裆</p>
+<p>三、使用<code>Method Swizzling</code></p>
+<p>​    1、防止button的暴力点击</p>
+<p>​    2、刷新<code>TableView</code>、<code>CollectionView</code>时，自动判断是否该显示暂无数据。</p>
+</blockquote>
+<h3 id="一、利用关联对象给分类添加完整属性"><a href="#一、利用关联对象给分类添加完整属性" class="headerlink" title="一、利用关联对象给分类添加完整属性"></a>一、利用关联对象给分类添加完整属性</h3><h4 id="1、分类里能添加属性，但不能添加成员变量"><a href="#1、分类里能添加属性，但不能添加成员变量" class="headerlink" title="1、分类里能添加属性，但不能添加成员变量"></a>1、分类里能添加属性，但不能添加成员变量</h4><p>举例来验证下：</p>
+<p>假设有一个<code>INEPerson</code>类，并且为它创建了一个分类<code>INEEat</code>。</p>
+<ul>
+<li>当我们在分类里添加属性时，编译器仅仅报警告说“<code>name</code>属性需要<code>name</code>方法和<code>setName:</code>方法的实现”，并建议我们“用<code>@dynamic</code>告诉编译器运行时才添加，或者直接在分类里添加这两个方法的实现”，编译能通过就证明：<strong>分类里能添加属性。</strong></li>
+</ul>
+<p><img src="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/1200-20220718103622988.png" alt="img"></p>
+<p><img src="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/1200-20220718103636300.png" alt="img"></p>
+<ul>
+<li>而当我们在分类里添加成员变量时，编译器直接报错说“成员变量不应该放在分类里”，编译报错就证明：<strong>分类里不能添加成员变量。</strong></li>
+</ul>
+<p><img src="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/1200-20220718103750853.png" alt="img"></p>
+<p><strong>那为什么分类里能添加属性，但不能添加成员变量呢？首先我们知道类的成员变量列表是只读的（类的本质、<code>class_ro_t</code>、<code>ivars</code>那儿还记得吧），所以它在编译后就不能被修改了。其次分类的内部有相应的成员变量来存储该分类为类扩展的方法、属性和协议，但没有特定的成员变量用来存储分类为类扩展的成员变量（分类的本质那儿还记得吧），因此分类能为类扩展属性，但不能为类扩展成员变量。</strong></p>
+<h4 id="2、虽然能添加属性，但添加的是不完整的属性"><a href="#2、虽然能添加属性，但添加的是不完整的属性" class="headerlink" title="2、虽然能添加属性，但添加的是不完整的属性"></a>2、虽然能添加属性，但添加的是不完整的属性</h4><p>我们都知道，给类添加一个属性，系统其实做了三件事：</p>
+<blockquote>
+<ul>
+<li>生成对应的成员变量</li>
+<li>生成对应<code>setter</code>、<code>getter</code>方法的声明</li>
+<li>生成对应<code>setter</code>、<code>getter</code>方法的实现</li>
+</ul>
+<p>我们称这为完整的属性</p>
+</blockquote>
+<p>举例来验证下：</p>
+<p>接着第1小节的例子，我们仅仅在<code>INEEat</code>分类里为<code>INEPerson</code>类添加了一个<code>name</code>属性，现在打印一下<code>INEPerson</code>类的实例方法列表、属性列表和成员变量列表。</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line">-----------ViewController.m-----------</span><br><span class="line"></span><br><span class="line"><span class="meta">#import <span class="string">&lt;objc/runtime.h&gt;</span></span></span><br><span class="line"><span class="meta">#import <span class="string">&quot;INEPerson.h&quot;</span></span></span><br><span class="line"></span><br><span class="line">- (<span class="built_in">NSArray</span> *)methodsOfClass:(Class)cls &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSMutableArray</span> *methods = [@[] mutableCopy];</span><br><span class="line">    </span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> count;</span><br><span class="line">    Method *methodList = class_copyMethodList(cls, &amp;count);</span><br><span class="line">    <span class="keyword">for</span> (<span class="built_in">NSInteger</span> i = <span class="number">0</span>; i &lt; count; i ++) &#123;</span><br><span class="line">        </span><br><span class="line">        Method method = methodList[I];</span><br><span class="line">        <span class="built_in">NSString</span> *methodName = <span class="built_in">NSStringFromSelector</span>(method_getName(method));</span><br><span class="line">        </span><br><span class="line">        [methods addObject:methodName];</span><br><span class="line">    &#125;</span><br><span class="line">    free(methodList);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> methods;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="built_in">NSArray</span> *)propsOfClass:(Class)cls &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSMutableArray</span> *props = [@[] mutableCopy];</span><br><span class="line">    </span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> count;</span><br><span class="line">    objc_property_t *propList = class_copyPropertyList(cls, &amp;count);</span><br><span class="line">    <span class="keyword">for</span> (<span class="built_in">NSInteger</span> i = <span class="number">0</span>; i &lt; count; i ++) &#123;</span><br><span class="line">        </span><br><span class="line">        objc_property_t property = propList[I];</span><br><span class="line">        <span class="built_in">NSString</span> *propName = [<span class="built_in">NSString</span> stringWithUTF8String:property_getName(property)];</span><br><span class="line">        </span><br><span class="line">        [props addObject:propName];</span><br><span class="line">    &#125;</span><br><span class="line">    free(propList);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> props;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="built_in">NSArray</span> *)ivarsOfClass:(Class)cls &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSMutableArray</span> *ivars = [@[] mutableCopy];</span><br><span class="line">    </span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> count;</span><br><span class="line">    Ivar *ivarList = class_copyIvarList(cls, &amp;count);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; count; i ++) &#123;</span><br><span class="line">        </span><br><span class="line">        Ivar ivar = ivarList[I];</span><br><span class="line">        <span class="built_in">NSString</span> *ivarName = [<span class="built_in">NSString</span> stringWithUTF8String:ivar_getName(ivar)];</span><br><span class="line">        </span><br><span class="line">        [ivars addObject:ivarName];</span><br><span class="line">    &#125;</span><br><span class="line">    free(ivarList);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> ivars;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)viewDidLoad &#123;</span><br><span class="line">    [<span class="variable language_">super</span> viewDidLoad];</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;实例方法列表：%@&quot;</span>, [<span class="keyword">self</span> methodsOfClass:[INEPerson <span class="keyword">class</span>]]);</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;属性列表：%@&quot;</span>, [<span class="keyword">self</span> propsOfClass:[INEPerson <span class="keyword">class</span>]]);</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;成员变量列表：%@&quot;</span>, [<span class="keyword">self</span> ivarsOfClass:[INEPerson <span class="keyword">class</span>]]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>控制台打印如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">实例方法列表：(</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">属性列表：(</span><br><span class="line">    name</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">成员变量列表：(</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>可见给分类添加一个属性，确确实实没有生成对应的成员变量，也没有生成对应<code>setter</code>、<code>getter</code>方法的实现（方法只有被实现了，才会被放入类的<code>methods</code>成员变量中）。</p>
+<p>此时我们去<code>INEEat</code>分类里，尝试自己实现一下<code>name</code>属性的<code>setter</code>、<code>getter</code>方法，发现方法名敲一半它们会自动弹出来，这就证明<code>name</code>属性的<code>setter</code>、<code>getter</code>方法已经被声明了。</p>
+<p><img src="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/1200-20220718104234339.png" alt="img"></p>
+<p><img src="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/1008.png" alt="img"></p>
+<p><strong>那为什么分类里能添加属性，但仅仅是生成了对应<code>setter</code>、<code>getter</code>方法的声明，而不生成它们的实现呢？这主要还是因为分类内部结构里不能存储成员变量，而导致没有生成属性对应的成员变量，进而导致没法生成<code>setter</code>、<code>getter</code>方法的实现，我们知道<code>setter</code>、<code>getter</code>方法的内部实现不就是给成员变量赋值、取值嘛。</strong></p>
+<h4 id="3、利用关联对象给分类添加完整的属性"><a href="#3、利用关联对象给分类添加完整的属性" class="headerlink" title="3、利用关联对象给分类添加完整的属性"></a>3、利用关联对象给分类添加完整的属性</h4><p>在开发中，我们肯定会遇到往分类里添加属性的需求，但既然系统不会为我们自动生成对应的成员变量和<code>setter</code>、<code>getter</code>方法的实现，那我们就自己搞成一个完整的属性吧。</p>
+<p>自己搞的话，添加一对儿<code>setter</code>、<code>getter</code>方法倒是很简单，难的地方在于它俩的内部实现应该怎么写，也就是说数据要存储在哪里、又从哪里读取，再进一步就是说我们得想办法找一个类似于成员变量那么个东西来存储数据、并从它里面读取数据，要不然<code>setter</code>、<code>getter</code>方法里面没法写啊！当然我们可以自己写一个全局的字典来模拟成员变量那样存取数据，不过要做很多额外的考虑（例如数据是否和对象一对一、数据何时应该销毁、多线程条件下数据写入是否安全等），所以就<strong>直接用Runtime给我们提供的关联对象来代替成员变量存储数据吧！关联对象其实就是一个对象，和成员变量的功能差不多，用来帮助我们存储数据和读取数据。</strong></p>
+<p>有了代替成员变量的关联对象，我们就可以顺利地自己实现<code>setter</code>、<code>getter</code>方法了，用到的是Runtime的API。</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">-----------INEPerson+INEEat.m-----------</span><br><span class="line"></span><br><span class="line"><span class="meta">#import <span class="string">&quot;INEPerson+INEEat.h&quot;</span></span></span><br><span class="line"><span class="meta">#import <span class="string">&lt;objc/runtime.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">INEPerson</span> (<span class="title">INEEat</span>)</span></span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)setName:(<span class="built_in">NSString</span> *)name &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// object：被关联对象</span></span><br><span class="line">    <span class="comment">// key：存储关联对象时对应的key</span></span><br><span class="line">    <span class="comment">// value：要存储的数据</span></span><br><span class="line">    <span class="comment">// policy：存储数据的策略</span></span><br><span class="line">    objc_setAssociatedObject(<span class="keyword">self</span>, <span class="string">@&quot;name&quot;</span>, name, OBJC_ASSOCIATION_COPY_NONATOMIC);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="built_in">NSString</span> *)name &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// object：被关联对象</span></span><br><span class="line">    <span class="comment">// key：存储关联对象时对应的key</span></span><br><span class="line">    <span class="keyword">return</span> objc_getAssociatedObject(<span class="keyword">self</span>, <span class="string">@&quot;name&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<p>移除关联对象：</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 移除某个关联对象，把value设置为nil即可</span></span><br><span class="line">objc_setAssociatedObject(<span class="keyword">self</span>, <span class="string">@&quot;name&quot;</span>, <span class="literal">nil</span>, OBJC_ASSOCIATION_COPY_NONATOMIC);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 移除所有的关联对象</span></span><br><span class="line">objc_removeAssociatedObjects(<span class="type">id</span> object);</span><br></pre></td></tr></table></figure>
+
+<p>数据存储策略：</p>
+<table>
+<thead>
+<tr>
+<th align="center">objc_AssociationPolicy</th>
+<th align="center">对应修饰符</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">OBJC_ASSOCIATION_ASSIGN</td>
+<td align="center">assign</td>
+</tr>
+<tr>
+<td align="center">OBJC_ASSOCIATION_RETAIN_NONATOMIC</td>
+<td align="center">strong、nonatomic</td>
+</tr>
+<tr>
+<td align="center">OBJC_ASSOCIATION_COPY_NONATOMIC</td>
+<td align="center">copy、nonatomic</td>
+</tr>
+<tr>
+<td align="center">OBJC_ASSOCIATION_RETAIN</td>
+<td align="center">strong、atomic</td>
+</tr>
+<tr>
+<td align="center">OBJC_ASSOCIATION_COPY</td>
+<td align="center">copy、atomic</td>
+</tr>
+</tbody></table>
+<h4 id="4、关联对象的本质"><a href="#4、关联对象的本质" class="headerlink" title="4、关联对象的本质"></a>4、关联对象的本质</h4><p>通过查看Runtime的源码（<code>objc-references.mm</code>文件），我们得到关联对象的定义如下：（伪代码）</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// objc_setAssociatedObject(..., ..., value, policy);</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ObjcAssociation</span> &#123;</span><br><span class="line">    <span class="type">uintptr_t</span> _policy;</span><br><span class="line">    id _value;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>可见<strong>关联对象的本质就是一个C++的<code>ObjcAssociation</code>对象，它内部存储着我们想要存储的数据和存储数据的策略，即<code>objc_setAssociatedObject(...)</code>函数的第三个、第四个参数。</strong></p>
+<p>然后关联对象会跟<code>objc_setAssociatedObject(...)</code>函数的第二个参数映射到一个叫<code>AssociationsMap</code>的小字典里，这个小字典维护着某个对象所有的关联对象。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// objc_setAssociatedObject(..., key, ..., ...);</span></span><br><span class="line"></span><br><span class="line">AssociationsMap = @&#123;</span><br><span class="line">                    key: ObjcAssociation,</span><br><span class="line">                    key: ObjcAssociation,</span><br><span class="line">                    ...</span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 例如：</span></span><br><span class="line">AssociationsMap = @&#123;</span><br><span class="line">                    <span class="string">&quot;name&quot;</span>: name属性对应的关联对象,</span><br><span class="line">                    <span class="string">&quot;age&quot;</span>: age属性对应的关联对象,</span><br><span class="line">                    ...</span><br><span class="line">                    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后<code>AssociationsMap</code>的小字典又会跟<code>objc_setAssociatedObject(...)</code>函数的第一个参数映射到一个叫<code>AssociationsHashMap</code>的大字典里，这个大字典是Runtime维护的一个全局的字典，它维护着整个项目中所有对象的所有关联对象。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// objc_setAssociatedObject(object, ..., ..., ...);</span></span><br><span class="line"></span><br><span class="line">AssociationsHashMap = @&#123;</span><br><span class="line">                        objcet: AssociationsMap,</span><br><span class="line">                        objcet: AssociationsMap,</span><br><span class="line">                        ...</span><br><span class="line">                        &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 例如：</span></span><br><span class="line">AssociationsHashMap = @&#123;</span><br><span class="line">                        person1: person1的AssociationsMap,</span><br><span class="line">                        person2: person2的AssociationsMap,</span><br><span class="line">                        ...</span><br><span class="line">                        &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="二、获取一个类所有的成员变量。实现一键归档解裆"><a href="#二、获取一个类所有的成员变量。实现一键归档解裆" class="headerlink" title="二、获取一个类所有的成员变量。实现一键归档解裆"></a>二、获取一个类所有的成员变量。实现一键归档解裆</h3><p>我们知道把一个复杂对象存储进<code>NSUserDefaults</code>的时候，必须先把复杂对象归档为<code>NSData</code>再存进去，读取的时候也必须先把<code>NSData</code>读出来然后再解裆为复杂对象。</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">-----------<span class="built_in">NSUserDefaults</span>+INESaveComplexObject.h-----------</span><br><span class="line"></span><br><span class="line"><span class="meta">#import <span class="string">&lt;Foundation/Foundation.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">NSUserDefaults</span> (<span class="title">INESaveComplexObject</span>)</span></span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)ine_setComplexObject:(<span class="type">id</span>)value forKey:(<span class="built_in">NSString</span> *)defaultName;</span><br><span class="line">- (<span class="type">id</span>)ine_complexObjectForKey:(<span class="built_in">NSString</span> *)defaultName;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">-----------<span class="built_in">NSUserDefaults</span>+INESaveComplexObject.m-----------</span><br><span class="line"></span><br><span class="line"><span class="meta">#import <span class="string">&quot;NSUserDefaults+INESaveComplexObject.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">NSUserDefaults</span> (<span class="title">INESaveComplexObject</span>)</span></span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)ine_setComplexObject:(<span class="type">id</span>)value forKey:(<span class="built_in">NSString</span> *)defaultName &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSData</span> *writeData = [<span class="built_in">NSKeyedArchiver</span> archivedDataWithRootObject:value];</span><br><span class="line">    [[<span class="built_in">NSUserDefaults</span> standardUserDefaults] setObject:writeData forKey:defaultName];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">id</span>)ine_complexObjectForKey:(<span class="built_in">NSString</span> *)defaultName &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSData</span> *readData = [[<span class="built_in">NSUserDefaults</span> standardUserDefaults] objectForKey:defaultName];</span><br><span class="line">    <span class="keyword">return</span> [<span class="built_in">NSKeyedUnarchiver</span> unarchiveObjectWithData:readData];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<p>而对象在归档解裆时又必须遵循<code>NSCoding</code>协议，并实现协议里的<code>encodeWithCoder:</code>、<code>initWithCoder:</code>方法，我们总不能把项目里所有的对象的所有的成员变量都这么写一遍吧，那样工作量太大了，并且这种重复的工作似乎没太大意义，于是可以考虑使用Runtime来做。给<code>NSObject</code>添加一个分类，让它遵循<code>NSCoding</code>协议，并且实现协议里的<code>encodeWithCoder:</code>、<code>initWithCoder:</code>方法，我们调用Runtime得API遍历一个类所有的成员变量，实现一键归解档。</p>
+<h3 id="三、使用Method-Swizzling"><a href="#三、使用Method-Swizzling" class="headerlink" title="三、使用Method Swizzling"></a>三、使用<code>Method Swizzling</code></h3><p>使用<code>Method Swizzling</code>需要注意以下几点：</p>
+<ul>
+<li><p><strong>方法交互操作一定要写在<code>+load</code>方法里，而不能写在<code>+initialize</code>方法里。</strong>因为<code>+load</code>方法是在类和分类加载到内存的时候调用的，不管代码里使用或者不使用这个类的分类都会被调用，而<code>+initialize</code>则是类被初始化的时候调用的，项目里没有用到这个类就不会被调用，所以要写在<code>+load</code>方法确保方法交换成功。</p>
+</li>
+<li><p><strong>方法交换操作一定要写在<code>dispatch_once</code>里。</strong>算然说<code>+load</code>方法本身只会执行一次，但是并不能确保其他人不会再某些地方主动再调用一次<code>+load</code>方法，这就可能导致又把两个方法的实现给交换回去了。</p>
+</li>
+<li><p><strong>在我们自己写的方法里，要判断一下触发了该方法的类是不是当前类，以免把类簇里的子类方法也替换掉。</strong>（例如下面的<code>UIButton</code>和<code>UITableView</code>就有类簇，OC中大量使用了类簇，我们常用的<code>NSString</code>、<code>NSArray</code>、<code>NSDictionary</code>等都采用类簇的形式实现）</p>
+</li>
+<li><p><strong>在我们自己写的方法里，记得要调用一些方法的原生实现</strong>（除非你非常确定不需要调用方法的原生实现），因为不调用一下的话，就可能因为丢掉方法的原生实现而导致不可预知的bug。</p>
+</li>
+</ul>
+<h4 id="1、防止button的暴力点击"><a href="#1、防止button的暴力点击" class="headerlink" title="1、防止button的暴力点击"></a>1、防止button的暴力点击</h4><p>我们知道所有继承自<code>UIControl</code>的类，在处理事件时都会首先调用<code>sendAction:to:forEvent:</code>方法，我们可以交换它的实现来防止<code>Button</code>的暴力点击。</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="string">&quot;UIButton+INEPreventViolentClick.h&quot;</span></span></span><br><span class="line"><span class="meta">#import <span class="string">&lt;objc/runtime.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> kTimeInterval 0.5 <span class="comment">// 被认定为暴力点击的时间间隔</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">UIButton</span> ()</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">assign</span>) <span class="built_in">NSTimeInterval</span> ine_lastTimeClickTimestamp; <span class="comment">// 上一次点击的时间戳</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">UIButton</span> (<span class="title">INEPreventViolentClick</span>)</span></span><br><span class="line"></span><br><span class="line">+ (<span class="type">void</span>)load &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">static</span> <span class="built_in">dispatch_once_t</span> onceToken;</span><br><span class="line">    <span class="built_in">dispatch_once</span>(&amp;onceToken, ^&#123;</span><br><span class="line">        </span><br><span class="line">        SEL originalSelector = <span class="keyword">@selector</span>(sendAction:to:forEvent:);</span><br><span class="line">        SEL swizzledSelector = <span class="keyword">@selector</span>(ine_sendAction:to:forEvent:);</span><br><span class="line">        </span><br><span class="line">        Method originalMethod = class_getInstanceMethod(<span class="keyword">self</span>, originalSelector);</span><br><span class="line">        Method swizzledMethod = class_getInstanceMethod(<span class="keyword">self</span>, swizzledSelector);</span><br><span class="line">        </span><br><span class="line">        IMP originalIMP = method_getImplementation(originalMethod);</span><br><span class="line">        IMP swizzleIMP = method_getImplementation(swizzledMethod);</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">const</span> <span class="type">char</span> *originalTypeEncoding = method_getTypeEncoding(originalMethod);</span><br><span class="line">        <span class="keyword">const</span> <span class="type">char</span> *swizzledTypeEncoding = method_getTypeEncoding(swizzledMethod);</span><br><span class="line">        </span><br><span class="line">        <span class="type">BOOL</span> didAddMethod = class_addMethod(<span class="keyword">self</span>, originalSelector, swizzleIMP, swizzledTypeEncoding);</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (didAddMethod) &#123;</span><br><span class="line">            </span><br><span class="line">            class_replaceMethod(<span class="keyword">self</span>, swizzledSelector, originalIMP, originalTypeEncoding);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            </span><br><span class="line">            method_exchangeImplementations(originalMethod, swizzledMethod);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)ine_sendAction:(SEL)action to:(<span class="keyword">nullable</span> <span class="type">id</span>)target forEvent:(<span class="keyword">nullable</span> <span class="built_in">UIEvent</span> *)event  &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> ([[<span class="keyword">self</span> <span class="keyword">class</span>] isEqual:[<span class="built_in">UIButton</span> <span class="keyword">class</span>]]) &#123; <span class="comment">// 以免把UIButton类簇里子类的方法也交换掉</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 获取此次点击的时间戳</span></span><br><span class="line">        <span class="built_in">NSTimeInterval</span> currentTimeClickTimestamp = [[<span class="built_in">NSDate</span> date] timeIntervalSince1970];</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (currentTimeClickTimestamp - <span class="keyword">self</span>.ine_lastTimeClickTimestamp &lt; kTwoTimeClickTimeInterval) &#123; <span class="comment">// 如果此次点击和上一次点击的时间间隔小于我们设定的时间间隔，则判定此次点击为暴力点击，什么都不做</span></span><br><span class="line">            </span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123; <span class="comment">// 否则我们判定此次点击为正常点击，button正常处理事件</span></span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 记录上次点击的时间戳</span></span><br><span class="line">            <span class="keyword">self</span>.ine_lastTimeClickTimestamp = currentTimeClickTimestamp;</span><br><span class="line">            </span><br><span class="line">            [<span class="keyword">self</span> ine_sendAction:action to:target forEvent:event];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        </span><br><span class="line">        [<span class="keyword">self</span> ine_sendAction:action to:target forEvent:event];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)setine_lastTimeClickTimestamp:(<span class="built_in">NSTimeInterval</span>)ine_lastTimeClickTimestamp &#123;</span><br><span class="line">    </span><br><span class="line">    objc_setAssociatedObject(<span class="keyword">self</span>, <span class="string">@&quot;ine_lastTimeClickTimestamp&quot;</span>, @(ine_lastTimeClickTimestamp), OBJC_ASSOCIATION_RETAIN_NONATOMIC);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="built_in">NSTimeInterval</span>)ine_lastTimeClickTimestamp &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> [objc_getAssociatedObject(<span class="keyword">self</span>, <span class="string">@&quot;ine_lastTimeClickTimestamp&quot;</span>) doubleValue];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="2、刷新TableView、CollectionView时，自动判断是否该显示暂无数据"><a href="#2、刷新TableView、CollectionView时，自动判断是否该显示暂无数据" class="headerlink" title="2、刷新TableView、CollectionView时，自动判断是否该显示暂无数据"></a>2、刷新<code>TableView</code>、<code>CollectionView</code>时，自动判断是否该显示暂无数据</h4><p><img src="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/1200-20220718103053060.png" alt="img"></p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// UITableView+PromptImage.h</span></span><br><span class="line"><span class="meta">#import <span class="string">&lt;UIKit/UIKit.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">UITableView</span> (<span class="title">INEPromptImage</span>)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/// 提示图的名字</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) <span class="built_in">NSString</span> *ine_promptImageName;</span><br><span class="line"><span class="comment">/// 提示文本</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) <span class="built_in">NSString</span> *ine_promptText;</span><br><span class="line"></span><br><span class="line"><span class="comment">/// 点击提示图的回调</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) <span class="type">void</span>(^ine_didTapPromptImage)(<span class="type">void</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">/// 不使用该分类里的这套判定规则</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">assign</span>) <span class="type">BOOL</span> ine_dontUseThisCategory;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// UITableView+PromptImage.m</span></span><br><span class="line"><span class="meta">#import <span class="string">&quot;UITableView+INEPromptImage.h&quot;</span></span></span><br><span class="line"><span class="meta">#import <span class="string">&lt;objc/runtime.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">UITableView</span> ()</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 已经调用过reloadData方法了</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">assign</span>) <span class="type">BOOL</span> ine_hasInvokedReloadData;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 提示图</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) <span class="built_in">UIButton</span> *ine_promptImageView;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">UITableView</span> (<span class="title">INEPromptImage</span>)</span></span><br><span class="line"></span><br><span class="line">+ (<span class="type">void</span>)load &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">static</span> <span class="built_in">dispatch_once_t</span> onceToken;</span><br><span class="line">    <span class="built_in">dispatch_once</span>(&amp;onceToken, ^&#123;</span><br><span class="line">        </span><br><span class="line">        [<span class="keyword">self</span> methodSwizzlingWithOriginalSelector:<span class="keyword">@selector</span>(reloadData) swizzledSelector:<span class="keyword">@selector</span>(ine_reloadData)];</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)ine_reloadData &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> ([[<span class="keyword">self</span> <span class="keyword">class</span>] isEqual:[<span class="built_in">UITableView</span> <span class="keyword">class</span>]] &amp;&amp; !<span class="keyword">self</span>.ine_dontUseThisCategory) &#123;<span class="comment">// 防止替换掉UITableView类簇里子类方法的实现</span></span><br><span class="line">        </span><br><span class="line">        [<span class="keyword">self</span> ine_reloadData];</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">self</span>.ine_hasInvokedReloadData) &#123;<span class="comment">// 而是只在请求数据完成后，调用reloadData刷新界面时才处理提示图的显隐</span></span><br><span class="line">            </span><br><span class="line">            [<span class="keyword">self</span> ine_handlePromptImage];</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;<span class="comment">// tableView第一次加载的时候会自动调用一下reloadData方法，这一次调用我们不处理提示图的显隐</span></span><br><span class="line">            </span><br><span class="line">            <span class="keyword">self</span>.ine_hasInvokedReloadData = <span class="literal">YES</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        </span><br><span class="line">        [<span class="keyword">self</span> ine_reloadData];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> mark - private method</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 提示图的显隐</span></span><br><span class="line">- (<span class="type">void</span>)ine_handlePromptImage &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> ([<span class="keyword">self</span> ine_dataIsEmpty]) &#123;</span><br><span class="line">        </span><br><span class="line">        [<span class="keyword">self</span> ine_showPromptImage];</span><br><span class="line">    &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">        </span><br><span class="line">        [<span class="keyword">self</span> ine_hidePromptImage];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 判断请求到的数据是否为空</span></span><br><span class="line">- (<span class="type">BOOL</span>)ine_dataIsEmpty &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 获取分区数</span></span><br><span class="line">    <span class="built_in">NSInteger</span> sections = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">if</span> ([<span class="keyword">self</span>.dataSource respondsToSelector:<span class="keyword">@selector</span>(numberOfSectionsInTableView:)]) &#123;<span class="comment">// 如果外界实现了该方法，则读取外界提供的分区数</span></span><br><span class="line">        </span><br><span class="line">        sections = [<span class="keyword">self</span> numberOfSections];</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;<span class="comment">// 如果外界没实现该方法，系统不是会自动给我们返回一个分区嘛</span></span><br><span class="line">        </span><br><span class="line">        sections = <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> (sections == <span class="number">0</span>) &#123;<span class="comment">// 分区数为0，说明数据为空</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> <span class="literal">YES</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 分区数不为0，则需要判断每个分区下的行数</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; sections; i ++) &#123;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 获取各个分区的行数</span></span><br><span class="line">        <span class="built_in">NSInteger</span> rows = [<span class="keyword">self</span> numberOfRowsInSection:i];</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (rows != <span class="number">0</span>) &#123;<span class="comment">// 但凡有一个分区下的行数不为0，说明数据不为空</span></span><br><span class="line">            </span><br><span class="line">            <span class="keyword">return</span> <span class="literal">NO</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 如果所有分区下的行数都为0，才说明数据为空</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">YES</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 显示提示图</span></span><br><span class="line">- (<span class="type">void</span>)ine_showPromptImage &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">self</span>.ine_promptImageView == <span class="literal">nil</span>) &#123;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">self</span>.ine_promptImageView = [[<span class="built_in">UIButton</span> alloc] initWithFrame:<span class="built_in">CGRectMake</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">60</span>, <span class="number">90</span>)];</span><br><span class="line">        <span class="keyword">self</span>.ine_promptImageView.backgroundColor = [<span class="built_in">UIColor</span> clearColor];</span><br><span class="line">        <span class="keyword">self</span>.ine_promptImageView.contentMode = <span class="built_in">UIViewContentModeCenter</span>;</span><br><span class="line">        <span class="keyword">self</span>.ine_promptImageView.userInteractionEnabled = <span class="literal">YES</span>;</span><br><span class="line">        <span class="keyword">self</span>.ine_promptImageView.adjustsImageWhenHighlighted = <span class="literal">NO</span>;</span><br><span class="line">        </span><br><span class="line">        </span><br><span class="line">        [<span class="keyword">self</span>.ine_promptImageView setTitleColor:Color_With_RGB(<span class="number">170</span>, <span class="number">170</span>, <span class="number">170</span>, <span class="number">1</span>) forState:(<span class="built_in">UIControlStateNormal</span>)];</span><br><span class="line">        <span class="keyword">self</span>.ine_promptImageView.titleLabel.font = [<span class="built_in">UIFont</span> systemFontOfSize:<span class="number">12</span>];</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (String_Is_Empty(<span class="keyword">self</span>.ine_promptText)) &#123;</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">self</span>.ine_promptText = <span class="string">@&quot;暂无数据&quot;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        [<span class="keyword">self</span>.ine_promptImageView setTitle:<span class="keyword">self</span>.ine_promptText forState:(<span class="built_in">UIControlStateNormal</span>)];</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">self</span>.ine_promptImageName.length == <span class="number">0</span>) &#123;</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">self</span>.ine_promptImageName = <span class="string">@&quot;BaseProject_NoDataPromptImage&quot;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        [<span class="keyword">self</span>.ine_promptImageView setImage:[<span class="built_in">UIImage</span> imageNamed:<span class="keyword">self</span>.ine_promptImageName] forState:(<span class="built_in">UIControlStateNormal</span>)];</span><br><span class="line">        [<span class="keyword">self</span>.ine_promptImageView layoutImageAndTitle:(ImageAndTitleLayoutStyleImageOnLabel) imageTitleSpace:<span class="number">5</span>];</span><br><span class="line">        </span><br><span class="line">        <span class="built_in">UITapGestureRecognizer</span> *tapGestureRecognizer = [[<span class="built_in">UITapGestureRecognizer</span> alloc] initWithTarget:<span class="keyword">self</span> action:<span class="keyword">@selector</span>(ine_didTapPromptImage:)];</span><br><span class="line">        [<span class="keyword">self</span>.ine_promptImageView addGestureRecognizer:tapGestureRecognizer];</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">self</span>.backgroundView = <span class="keyword">self</span>.ine_promptImageView;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 隐藏提示图</span></span><br><span class="line">- (<span class="type">void</span>)ine_hidePromptImage &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">self</span>.backgroundView = <span class="literal">nil</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 点击提示图的回调</span></span><br><span class="line">- (<span class="type">void</span>)ine_didTapPromptImage:(<span class="built_in">UITapGestureRecognizer</span> *)tapGestureRecognizer &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">self</span>.ine_didTapPromptImage) &#123;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">self</span>.ine_didTapPromptImage();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> mark - setter, getter</span></span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)setine_hasInvokedReloadData:(<span class="type">BOOL</span>)ine_hasInvokedReloadData &#123;</span><br><span class="line">    </span><br><span class="line">    objc_setAssociatedObject(<span class="keyword">self</span>, <span class="string">@&quot;ine_hasInvokedReloadData&quot;</span>, @(ine_hasInvokedReloadData), OBJC_ASSOCIATION_RETAIN_NONATOMIC);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">BOOL</span>)ine_hasInvokedReloadData &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> [objc_getAssociatedObject(<span class="keyword">self</span>, <span class="string">@&quot;ine_hasInvokedReloadData&quot;</span>) boolValue];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)setine_promptImageView:(<span class="built_in">UIImageView</span> *)ine_promptImageView &#123;</span><br><span class="line">    </span><br><span class="line">    objc_setAssociatedObject(<span class="keyword">self</span>, <span class="string">@&quot;ine_promptImageView&quot;</span>, ine_promptImageView, OBJC_ASSOCIATION_RETAIN_NONATOMIC);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="built_in">UIImageView</span> *)ine_promptImageView &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> objc_getAssociatedObject(<span class="keyword">self</span>, <span class="string">@&quot;ine_promptImageView&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)setine_promptText:(<span class="built_in">NSString</span> *)ine_promptText &#123;</span><br><span class="line">    </span><br><span class="line">    objc_setAssociatedObject(<span class="keyword">self</span>, <span class="string">@&quot;ine_promptText&quot;</span>, ine_promptText, OBJC_ASSOCIATION_RETAIN_NONATOMIC);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="built_in">NSString</span> *)ine_promptText &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> objc_getAssociatedObject(<span class="keyword">self</span>, <span class="string">@&quot;ine_promptText&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)setine_promptImageName:(<span class="built_in">NSString</span> *)ine_promptImageName &#123;</span><br><span class="line">    </span><br><span class="line">    objc_setAssociatedObject(<span class="keyword">self</span>, <span class="string">@&quot;ine_promptImageName&quot;</span>, ine_promptImageName, OBJC_ASSOCIATION_RETAIN_NONATOMIC);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="built_in">NSString</span> *)ine_promptImageName &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> objc_getAssociatedObject(<span class="keyword">self</span>, <span class="string">@&quot;ine_promptImageName&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)setine_didTapPromptImage:(<span class="type">void</span> (^)(<span class="type">void</span>))ine_didTapPromptImage &#123;</span><br><span class="line">    </span><br><span class="line">    objc_setAssociatedObject(<span class="keyword">self</span>, <span class="string">@&quot;ine_didTapPromptImage&quot;</span>, ine_didTapPromptImage, OBJC_ASSOCIATION_COPY);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span> (^)(<span class="type">void</span>))ine_didTapPromptImage &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> objc_getAssociatedObject(<span class="keyword">self</span>, <span class="string">@&quot;ine_didTapPromptImage&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)setine_dontUseThisCategory:(<span class="type">BOOL</span>)ine_dontUseThisCategory &#123;</span><br><span class="line">    </span><br><span class="line">    objc_setAssociatedObject(<span class="keyword">self</span>, <span class="string">@&quot;ine_dontUseThisCategory&quot;</span>, @(ine_dontUseThisCategory), OBJC_ASSOCIATION_RETAIN_NONATOMIC);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">BOOL</span>)ine_dontUseThisCategory &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> [objc_getAssociatedObject(<span class="keyword">self</span>, <span class="string">@&quot;ine_dontUseThisCategory&quot;</span>) boolValue];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Runtime%E7%B3%BB%E5%88%97/" rel="tag"># Runtime系列</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/07/13/Runtime%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F/" rel="prev" title="【Runtime】Runtime是什么？">
+      <i class="fa fa-chevron-left"></i> 【Runtime】Runtime是什么？
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/07/13/Runtime%EF%BC%9Aisa%E6%8C%87%E9%92%88%E5%92%8CsuperClass%E6%8C%87%E9%92%88%E7%9A%84%E6%8C%87%E5%90%91%EF%BC%8Cmethods%E3%80%81cache%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E8%AF%A6%E8%A7%A3/" rel="next" title="Runtime：isa指针和superClass指针的指向，methods、cache成员变量详解">
+      Runtime：isa指针和superClass指针的指向，methods、cache成员变量详解 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%88%A9%E7%94%A8%E5%85%B3%E8%81%94%E5%AF%B9%E8%B1%A1%E7%BB%99%E5%88%86%E7%B1%BB%E6%B7%BB%E5%8A%A0%E5%AE%8C%E6%95%B4%E5%B1%9E%E6%80%A7"><span class="nav-number">1.</span> <span class="nav-text">一、利用关联对象给分类添加完整属性</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1%E3%80%81%E5%88%86%E7%B1%BB%E9%87%8C%E8%83%BD%E6%B7%BB%E5%8A%A0%E5%B1%9E%E6%80%A7%EF%BC%8C%E4%BD%86%E4%B8%8D%E8%83%BD%E6%B7%BB%E5%8A%A0%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F"><span class="nav-number">1.1.</span> <span class="nav-text">1、分类里能添加属性，但不能添加成员变量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%E3%80%81%E8%99%BD%E7%84%B6%E8%83%BD%E6%B7%BB%E5%8A%A0%E5%B1%9E%E6%80%A7%EF%BC%8C%E4%BD%86%E6%B7%BB%E5%8A%A0%E7%9A%84%E6%98%AF%E4%B8%8D%E5%AE%8C%E6%95%B4%E7%9A%84%E5%B1%9E%E6%80%A7"><span class="nav-number">1.2.</span> <span class="nav-text">2、虽然能添加属性，但添加的是不完整的属性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3%E3%80%81%E5%88%A9%E7%94%A8%E5%85%B3%E8%81%94%E5%AF%B9%E8%B1%A1%E7%BB%99%E5%88%86%E7%B1%BB%E6%B7%BB%E5%8A%A0%E5%AE%8C%E6%95%B4%E7%9A%84%E5%B1%9E%E6%80%A7"><span class="nav-number">1.3.</span> <span class="nav-text">3、利用关联对象给分类添加完整的属性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4%E3%80%81%E5%85%B3%E8%81%94%E5%AF%B9%E8%B1%A1%E7%9A%84%E6%9C%AC%E8%B4%A8"><span class="nav-number">1.4.</span> <span class="nav-text">4、关联对象的本质</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E8%8E%B7%E5%8F%96%E4%B8%80%E4%B8%AA%E7%B1%BB%E6%89%80%E6%9C%89%E7%9A%84%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E3%80%82%E5%AE%9E%E7%8E%B0%E4%B8%80%E9%94%AE%E5%BD%92%E6%A1%A3%E8%A7%A3%E8%A3%86"><span class="nav-number">2.</span> <span class="nav-text">二、获取一个类所有的成员变量。实现一键归档解裆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E4%BD%BF%E7%94%A8Method-Swizzling"><span class="nav-number">3.</span> <span class="nav-text">三、使用Method Swizzling</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1%E3%80%81%E9%98%B2%E6%AD%A2button%E7%9A%84%E6%9A%B4%E5%8A%9B%E7%82%B9%E5%87%BB"><span class="nav-number">3.1.</span> <span class="nav-text">1、防止button的暴力点击</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%E3%80%81%E5%88%B7%E6%96%B0TableView%E3%80%81CollectionView%E6%97%B6%EF%BC%8C%E8%87%AA%E5%8A%A8%E5%88%A4%E6%96%AD%E6%98%AF%E5%90%A6%E8%AF%A5%E6%98%BE%E7%A4%BA%E6%9A%82%E6%97%A0%E6%95%B0%E6%8D%AE"><span class="nav-number">3.2.</span> <span class="nav-text">2、刷新TableView、CollectionView时，自动判断是否该显示暂无数据</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="lijifeng"
+      src="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/avatar.jpg">
+  <p class="site-author-name" itemprop="name">lijifeng</p>
+  <div class="site-description" itemprop="description">个人博客</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">9</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://carlwe.com/" title="https:&#x2F;&#x2F;carlwe.com&#x2F;" rel="noopener" target="_blank">carlwe</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lijifeng</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : true,
+      appId      : 'bWi6klBzJ94DAMDz2tR3Q4V4-gzGzoHsz',
+      appKey     : 'bkDWqUctHShLgDzsCF9n70Fx',
+      placeholder: "发表一下你的看法",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : 'zh-cn' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
