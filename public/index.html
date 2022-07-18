@@ -22,9 +22,9 @@
 
   <meta name="description" content="个人博客">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Welcome to my blog">
+<meta property="og:title" content="lijifeng">
 <meta property="og:url" content="https://lijifeng168.com/index.html">
-<meta property="og:site_name" content="Welcome to my blog">
+<meta property="og:site_name" content="lijifeng">
 <meta property="og:description" content="个人博客">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:author" content="lijifeng">
@@ -43,7 +43,7 @@
   };
 </script>
 
-  <title>Welcome to my blog</title>
+  <title>lijifeng</title>
   
 
 
@@ -94,7 +94,7 @@
 
     <a href="/" class="brand" rel="start">
       <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">Welcome to my blog</h1>
+      <h1 class="site-title">lijifeng</h1>
       <span class="logo-line-after"><i></i></span>
     </a>
       <p class="site-subtitle" itemprop="description">文明其精神，野蛮其体魄</p>
@@ -158,97 +158,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://lijifeng168.com/2022/07/13/Runtime%EF%BC%9Aisa%E6%8C%87%E9%92%88%E5%92%8CsuperClass%E6%8C%87%E9%92%88%E7%9A%84%E6%8C%87%E5%90%91%EF%BC%8Cmethods%E3%80%81cache%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E8%AF%A6%E8%A7%A3/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/avatar.jpg">
-      <meta itemprop="name" content="lijifeng">
-      <meta itemprop="description" content="个人博客">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Welcome to my blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/07/13/Runtime%EF%BC%9Aisa%E6%8C%87%E9%92%88%E5%92%8CsuperClass%E6%8C%87%E9%92%88%E7%9A%84%E6%8C%87%E5%90%91%EF%BC%8Cmethods%E3%80%81cache%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E8%AF%A6%E8%A7%A3/" class="post-title-link" itemprop="url">Runtime：isa指针和superClass指针的指向，methods、cache成员变量详解</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-07-13 20:12:53" itemprop="dateCreated datePublished" datetime="2022-07-13T20:12:53+08:00">2022-07-13</time>
-            </span>
-
-          
-            <span id="/2022/07/13/Runtime%EF%BC%9Aisa%E6%8C%87%E9%92%88%E5%92%8CsuperClass%E6%8C%87%E9%92%88%E7%9A%84%E6%8C%87%E5%90%91%EF%BC%8Cmethods%E3%80%81cache%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E8%AF%A6%E8%A7%A3/" class="post-meta-item leancloud_visitors" data-flag-title="Runtime：isa指针和superClass指针的指向，methods、cache成员变量详解" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/2022/07/13/Runtime%EF%BC%9Aisa%E6%8C%87%E9%92%88%E5%92%8CsuperClass%E6%8C%87%E9%92%88%E7%9A%84%E6%8C%87%E5%90%91%EF%BC%8Cmethods%E3%80%81cache%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E8%AF%A6%E8%A7%A3/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2022/07/13/Runtime%EF%BC%9Aisa%E6%8C%87%E9%92%88%E5%92%8CsuperClass%E6%8C%87%E9%92%88%E7%9A%84%E6%8C%87%E5%90%91%EF%BC%8Cmethods%E3%80%81cache%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E8%AF%A6%E8%A7%A3/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><img src="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/1200-20220713203040874.png" alt="img"></p>
-<blockquote>
-<p>一、对象、类、元类的<code>isa</code>指针和<code>superClass</code>指针指向讲解</p>
-<p>二、类、元类的<code>methods</code>成员变量详解</p>
-<p>三、类、元类的<code>cache</code>成员变量详解</p>
-</blockquote>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/07/13/Runtime%EF%BC%9Aisa%E6%8C%87%E9%92%88%E5%92%8CsuperClass%E6%8C%87%E9%92%88%E7%9A%84%E6%8C%87%E5%90%91%EF%BC%8Cmethods%E3%80%81cache%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E8%AF%A6%E8%A7%A3/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://lijifeng168.com/2021/07/17/Runtime%E5%AE%9E%E9%99%85%E5%BA%94%E7%94%A8/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -258,7 +167,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Welcome to my blog">
+      <meta itemprop="name" content="lijifeng">
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
@@ -344,7 +253,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Welcome to my blog">
+      <meta itemprop="name" content="lijifeng">
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
@@ -430,7 +339,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Welcome to my blog">
+      <meta itemprop="name" content="lijifeng">
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
@@ -508,6 +417,97 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://lijifeng168.com/2021/07/12/Runtime%EF%BC%9Aisa%E6%8C%87%E9%92%88%E5%92%8CsuperClass%E6%8C%87%E9%92%88%E7%9A%84%E6%8C%87%E5%90%91%EF%BC%8Cmethods%E3%80%81cache%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E8%AF%A6%E8%A7%A3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/avatar.jpg">
+      <meta itemprop="name" content="lijifeng">
+      <meta itemprop="description" content="个人博客">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="lijifeng">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/07/12/Runtime%EF%BC%9Aisa%E6%8C%87%E9%92%88%E5%92%8CsuperClass%E6%8C%87%E9%92%88%E7%9A%84%E6%8C%87%E5%90%91%EF%BC%8Cmethods%E3%80%81cache%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E8%AF%A6%E8%A7%A3/" class="post-title-link" itemprop="url">【Runtime】isa指针和superClass指针的指向，methods、cache成员变量详解</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-07-12 20:12:53" itemprop="dateCreated datePublished" datetime="2021-07-12T20:12:53+08:00">2021-07-12</time>
+            </span>
+
+          
+            <span id="/2021/07/12/Runtime%EF%BC%9Aisa%E6%8C%87%E9%92%88%E5%92%8CsuperClass%E6%8C%87%E9%92%88%E7%9A%84%E6%8C%87%E5%90%91%EF%BC%8Cmethods%E3%80%81cache%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E8%AF%A6%E8%A7%A3/" class="post-meta-item leancloud_visitors" data-flag-title="【Runtime】isa指针和superClass指针的指向，methods、cache成员变量详解" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/07/12/Runtime%EF%BC%9Aisa%E6%8C%87%E9%92%88%E5%92%8CsuperClass%E6%8C%87%E9%92%88%E7%9A%84%E6%8C%87%E5%90%91%EF%BC%8Cmethods%E3%80%81cache%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E8%AF%A6%E8%A7%A3/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/07/12/Runtime%EF%BC%9Aisa%E6%8C%87%E9%92%88%E5%92%8CsuperClass%E6%8C%87%E9%92%88%E7%9A%84%E6%8C%87%E5%90%91%EF%BC%8Cmethods%E3%80%81cache%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E8%AF%A6%E8%A7%A3/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><img src="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/1200-20220713203040874.png" alt="img"></p>
+<blockquote>
+<p>一、对象、类、元类的<code>isa</code>指针和<code>superClass</code>指针指向讲解</p>
+<p>二、类、元类的<code>methods</code>成员变量详解</p>
+<p>三、类、元类的<code>cache</code>成员变量详解</p>
+</blockquote>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/07/12/Runtime%EF%BC%9Aisa%E6%8C%87%E9%92%88%E5%92%8CsuperClass%E6%8C%87%E9%92%88%E7%9A%84%E6%8C%87%E5%90%91%EF%BC%8Cmethods%E3%80%81cache%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E8%AF%A6%E8%A7%A3/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://lijifeng168.com/2021/07/10/RunLoop/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -517,7 +517,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Welcome to my blog">
+      <meta itemprop="name" content="lijifeng">
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
@@ -613,7 +613,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Welcome to my blog">
+      <meta itemprop="name" content="lijifeng">
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
@@ -704,7 +704,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Welcome to my blog">
+      <meta itemprop="name" content="lijifeng">
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
@@ -795,7 +795,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Welcome to my blog">
+      <meta itemprop="name" content="lijifeng">
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
@@ -881,7 +881,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Welcome to my blog">
+      <meta itemprop="name" content="lijifeng">
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
