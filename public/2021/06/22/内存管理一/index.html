@@ -17,7 +17,7 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"lijifeng168.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+    var CONFIG = {"hostname":"lijifeng168.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
   <meta name="description" content="一、iOS内存管理方式： ​    1.Tagged Pointer：小对象的内存管理方式 ​    2.引用计数：普通对象的内存管理方式 二、MRC介绍，需要开发工程师做哪些工作 三、ARC介绍，编译器帮我们做了什么">
@@ -132,16 +132,6 @@
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
 
   </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
-
-  </li>
   </ul>
 </nav>
 
@@ -173,7 +163,7 @@
     <link itemprop="mainEntityOfPage" href="https://lijifeng168.com/2021/06/22/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%B8%80/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/avatar.jpg">
+      <meta itemprop="image" content="/images/avatar.gif">
       <meta itemprop="name" content="lijifeng">
       <meta itemprop="description" content="个人博客">
     </span>
@@ -195,29 +185,15 @@
 
               <time title="创建时间：2021-06-22 14:18:11" itemprop="dateCreated datePublished" datetime="2021-06-22T14:18:11+08:00">2021-06-22</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-07-17 11:05:08" itemprop="dateModified" datetime="2022-07-17T11:05:08+08:00">2022-07-17</time>
+              </span>
 
           
-            <span id="/2021/06/22/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%B8%80/" class="post-meta-item leancloud_visitors" data-flag-title="内存管理一" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/2021/06/22/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%B8%80/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2021/06/22/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%B8%80/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
 
         </div>
       </header>
@@ -458,7 +434,6 @@
 
           </div>
           
-    <div class="comments" id="valine-comments"></div>
 
 <script>
   window.addEventListener('tabs:register', () => {
@@ -511,8 +486,6 @@
 
       <div class="site-overview-wrap sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <img class="site-author-image" itemprop="image" alt="lijifeng"
-      src="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/avatar.jpg">
   <p class="site-author-name" itemprop="name">lijifeng</p>
   <div class="site-description" itemprop="description">个人博客</div>
 </div>
@@ -527,7 +500,6 @@
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
-          
         <span class="site-state-item-count">4</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
@@ -535,16 +507,6 @@
 </div>
 
 
-  <div class="links-of-blogroll motion-element">
-    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
-      友情链接
-    </div>
-    <ul class="links-of-blogroll-list">
-        <li class="links-of-blogroll-item">
-          <a href="https://carlwe.com/" title="https:&#x2F;&#x2F;carlwe.com&#x2F;" rel="noopener" target="_blank">carlwe</a>
-        </li>
-    </ul>
-  </div>
 
       </div>
 
@@ -561,14 +523,11 @@
         
 
         
-  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">晋ICP备2022005502号 </a>
-      <img src="https://blog-1311875715.cos.ap-beijing.myqcloud.com/blog/policebeian.png" style="display: inline-block;">
-  </div>
 
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2024</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
@@ -627,35 +586,6 @@
   
 
   
-
-
-<script>
-NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
-  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
-    var GUEST = ['nick', 'mail', 'link'];
-    var guest = 'nick';
-    guest = guest.split(',').filter(item => {
-      return GUEST.includes(item);
-    });
-    new Valine({
-      el         : '#valine-comments',
-      verify     : false,
-      notify     : true,
-      appId      : 'bWi6klBzJ94DAMDz2tR3Q4V4-gzGzoHsz',
-      appKey     : 'bkDWqUctHShLgDzsCF9n70Fx',
-      placeholder: "发表一下你的看法",
-      avatar     : 'mm',
-      meta       : guest,
-      pageSize   : '10' || 10,
-      visitor    : true,
-      lang       : 'zh-cn' || 'zh-cn',
-      path       : location.pathname,
-      recordIP   : false,
-      serverURLs : ''
-    });
-  }, window.Valine);
-});
-</script>
 
 </body>
 </html>
