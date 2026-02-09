@@ -7,7 +7,7 @@ import {
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import { execSync } from "child_process";
-import { writeFileSync, existsSync, readFileSync } from "fs";
+import { writeFileSync, existsSync, readFileSync, readdirSync, unlinkSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
@@ -123,76 +123,93 @@ ${body}`;
   return { filePath, fileName };
 }
 
-// Git 操作
+// Git 操作（捕获 stderr 以便在失败时给用户更具体的提示）
 function gitAddCommitPush(fileName, commitMessage) {
   const cwd = BLOG_ROOT;
-  
+
   try {
-    // git add
-    execSync(`git add source/_posts/${fileName}`, { cwd, stdio: "inherit" });
-    
-    // git commit
+    execSync(`git add source/_posts/${fileName}`, { cwd, encoding: "utf-8" });
     const message = commitMessage || `发布新文章: ${fileName}`;
-    execSync(`git commit -m "${message}"`, { cwd, stdio: "inherit" });
-    
-    // git push - 自动检测当前分支
+    execSync(`git commit -m "${message}"`, { cwd, encoding: "utf-8" });
     const currentBranch = execSync("git branch --show-current", { cwd, encoding: "utf-8" }).trim();
-    execSync(`git push origin ${currentBranch}`, { cwd, stdio: "inherit" });
-    
+    execSync(`git push origin ${currentBranch}`, { cwd, encoding: "utf-8" });
     return true;
   } catch (error) {
-    throw new Error(`Git 操作失败: ${error.message}`);
+    const stderr = (error.stderr || error.stdout || error.message || "").toString().trim();
+    let hint = "";
+    if (/Permission denied|publickey|Authentication failed/i.test(stderr) || /Permission denied|publickey/i.test(error.message))
+      hint = "\n\n💡 可能原因：本机未配置 GitHub 推送权限。请配置 SSH 公钥（或 HTTPS Token）后重试。";
+    else if (/tell me who you are|user\.name|user\.email/i.test(stderr))
+      hint = "\n\n💡 可能原因：未配置 Git 用户信息。请在终端执行：git config --global user.name \"你的名字\" 与 git config --global user.email \"你的邮箱\"";
+    throw new Error(`Git 操作失败: ${error.message}${stderr ? "\n" + stderr : ""}${hint}`);
   }
 }
 
-// Hexo 部署
+// Hexo 部署：-g 表示先 generate 再 deploy，一条命令完成
 function hexoDeploy() {
   const cwd = BLOG_ROOT;
-  
+
   try {
-    // 确保在正确的目录
     if (!existsSync(join(cwd, "package.json"))) {
-      throw new Error("未找到 Hexo 项目");
+      throw new Error("未找到 Hexo 项目。请确认当前在 JFBlog 项目根目录，且已存在 package.json。");
     }
-    
-    // 先执行 hexo generate 生成静态文件
-    execSync("npx hexo generate", { cwd, stdio: "inherit" });
-    
-    // 再执行 hexo deploy 部署到 GitHub Pages
-    execSync("npx hexo deploy", { cwd, stdio: "inherit" });
-    
-    // 确保部署仓库正确配置远程并推送
-    const deployGitDir = join(cwd, ".deploy_git");
-    if (existsSync(deployGitDir)) {
-      try {
-        // 检查并配置远程仓库
-        try {
-          execSync("git remote get-url origin", { cwd: deployGitDir, stdio: "pipe" });
-        } catch {
-          // 如果没有远程仓库，添加它
-          execSync("git remote add origin git@github.com:lijifeng123/lijifeng123.github.io.git", { 
-            cwd: deployGitDir, 
-            stdio: "pipe" 
-          });
-        }
-        
-        // 确保远程 URL 正确
-        execSync("git remote set-url origin git@github.com:lijifeng123/lijifeng123.github.io.git", { 
-          cwd: deployGitDir, 
-          stdio: "pipe" 
-        });
-        
-        // 强制推送到远程
-        execSync("git push origin main --force", { cwd: deployGitDir, stdio: "inherit" });
-      } catch (pushError) {
-        // 如果推送失败，记录但不中断流程（hexo deploy 应该已经推送了）
-        console.error("额外推送步骤失败（可能已经推送）:", pushError.message);
-      }
-    }
-    
+    execSync("npx hexo deploy -g", { cwd, encoding: "utf-8" });
     return true;
   } catch (error) {
-    throw new Error(`Hexo 部署失败: ${error.message}`);
+    const stderr = (error.stderr || error.stdout || error.message || "").toString().trim();
+    let hint = "";
+    if (/command not found|not recognized|ENOENT/i.test(error.message) || /hexo.*not found/i.test(stderr))
+      hint = "\n\n💡 可能原因：未安装 Node 或未在项目里安装依赖。请先安装 Node.js，并在 JFBlog 根目录执行：npm install";
+    else if (/Permission denied|publickey|Authentication failed/i.test(stderr))
+      hint = "\n\n💡 可能原因：推送静态站到 GitHub 时认证失败，请确认本机已配置 GitHub 推送权限（SSH 或 HTTPS Token）。";
+    throw new Error(`Hexo 部署失败: ${error.message}${stderr ? "\n" + stderr : ""}${hint}`);
+  }
+}
+
+// deploy 后把本地生成内容 reset 掉，避免下次发布时被一起提交
+function resetGeneratedFiles() {
+  const cwd = BLOG_ROOT;
+  try {
+    execSync("git checkout HEAD -- public db.json", { cwd, encoding: "utf-8", stdio: "pipe" });
+  } catch {
+    // 若 public/db.json 未跟踪或不存在，忽略
+  }
+}
+
+// 根据标题或文件名查找文章（返回 { fileName, filePath } 或 null）
+function findPostFile(identifier) {
+  const raw = (identifier || "").toString().trim();
+  if (!raw) return null;
+  const withExt = raw.endsWith(".md") ? raw : raw + ".md";
+  const pathWithExt = join(POSTS_DIR, withExt);
+  if (existsSync(pathWithExt)) return { fileName: withExt, filePath: pathWithExt };
+  const byTitle = generateFileName(raw);
+  const pathByTitle = join(POSTS_DIR, byTitle);
+  if (existsSync(pathByTitle)) return { fileName: byTitle, filePath: pathByTitle };
+  const files = readdirSync(POSTS_DIR);
+  const match = files.find((f) => f === withExt || f === byTitle || f.replace(/\.md$/, "") === raw.replace(/\.md$/, ""));
+  if (match) return { fileName: match, filePath: join(POSTS_DIR, match) };
+  return null;
+}
+
+// Git 删除文件并提交推送
+function gitRemoveCommitPush(fileName, commitMessage) {
+  const cwd = BLOG_ROOT;
+  try {
+    execSync(`git rm "source/_posts/${fileName}"`, { cwd, encoding: "utf-8" });
+    const message = commitMessage || `删除文章: ${fileName}`;
+    execSync(`git commit -m "${message}"`, { cwd, encoding: "utf-8" });
+    const currentBranch = execSync("git branch --show-current", { cwd, encoding: "utf-8" }).trim();
+    execSync(`git push origin ${currentBranch}`, { cwd, encoding: "utf-8" });
+    return true;
+  } catch (error) {
+    const stderr = (error.stderr || error.stdout || error.message || "").toString().trim();
+    let hint = "";
+    if (/Permission denied|publickey|Authentication failed/i.test(stderr) || /Permission denied|publickey/i.test(error.message))
+      hint = "\n\n💡 可能原因：本机未配置 GitHub 推送权限。请配置 SSH 公钥（或 HTTPS Token）后重试。";
+    else if (/tell me who you are|user\.name|user\.email/i.test(stderr))
+      hint = "\n\n💡 可能原因：未配置 Git 用户信息。请在终端执行：git config --global user.name \"你的名字\" 与 git config --global user.email \"你的邮箱\"";
+    throw new Error(`Git 操作失败: ${error.message}${stderr ? "\n" + stderr : ""}${hint}`);
   }
 }
 
@@ -215,34 +232,45 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
     tools: [
       {
         name: "publish_blog_post",
-        description: "发布一篇博客文章。接收 markdown 内容，保存到 source/_posts/，提交到 git，并执行 hexo 部署。",
+        description: "发布博客文章。规则：先输出内容预览，等待用户确认；用户确认后（confirm: true）才执行保存、提交、部署。首次调用请传 confirm: false 或省略 confirm，向用户展示预览并提示确认；用户同意后再调用一次并传 confirm: true。",
         inputSchema: {
           type: "object",
           properties: {
             content: {
               type: "string",
-              description: "博客文章的 markdown 内容。可以包含 front matter（YAML 头部），也可以不包含。如果不包含，将自动生成。",
+              description: "博客文章的 markdown 内容。可含 front matter，也可不含（将自动生成）。",
             },
-            title: {
-              type: "string",
-              description: "文章标题（可选）。如果内容中已有 front matter 包含 title，此参数将被忽略。",
-            },
-            commitMessage: {
-              type: "string",
-              description: "Git commit 消息（可选）。默认为 '发布新文章: {文件名}'",
-            },
-            skipDeploy: {
-              type: "boolean",
-              description: "是否跳过部署步骤（可选）。如果为 true，只保存文件并提交到 git，不执行 hexo deploy。",
-              default: false,
-            },
+            title: { type: "string", description: "文章标题（可选）。若内容中已有 front matter 的 title 则忽略。" },
+            commitMessage: { type: "string", description: "Git commit 消息（可选）。默认：发布新文章: {文件名}" },
+            skipDeploy: { type: "boolean", description: "是否跳过部署（可选）。true 则只提交到 git，不执行 hexo deploy。", default: false },
             confirm: {
               type: "boolean",
-              description: "确认发布（必需）。必须设置为 true 才会真正发布文章。如果为 false 或未设置，只会返回预览信息。",
+              description: "是否确认发布。false 或未设置：仅返回预览，不执行任何写操作；true：在用户已确认的前提下执行保存、git 提交与部署。",
               default: false,
             },
           },
           required: ["content"],
+        },
+      },
+      {
+        name: "delete_blog_post",
+        description: "删除博客文章。规则：先输出将删除的文章信息，等待用户确认；用户确认后（confirm: true）才执行删除、提交、部署。首次调用请传 confirm: false，向用户展示将删除的项并提示确认；用户同意后再调用并传 confirm: true。",
+        inputSchema: {
+          type: "object",
+          properties: {
+            post: {
+              type: "string",
+              description: "要删除的文章标识：可为文件名（如 xxx.md）或标题（如与文件名对应的标题）。",
+            },
+            commitMessage: { type: "string", description: "Git commit 消息（可选）。默认：删除文章: {文件名}" },
+            skipDeploy: { type: "boolean", description: "是否跳过部署。true 则只从仓库删除并推送，不执行 hexo deploy。", default: false },
+            confirm: {
+              type: "boolean",
+              description: "是否确认删除。false 或未设置：仅返回将删除的项预览，不执行删除；true：在用户已确认的前提下执行删除、git 提交与部署。",
+              default: false,
+            },
+          },
+          required: ["post"],
         },
       },
     ],
@@ -325,11 +353,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       let deployResult = "";
       if (!skipDeploy) {
         hexoDeploy();
+        resetGeneratedFiles();
         deployResult = "并已部署到网站。";
       } else {
         deployResult = "（已跳过部署步骤）。";
       }
-      
+
       return {
         content: [
           {
@@ -355,7 +384,67 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       };
     }
   }
-  
+
+  if (name === "delete_blog_post") {
+    try {
+      const { post, commitMessage, skipDeploy = false, confirm = false } = args;
+      if (!post) {
+        return { content: [{ type: "text", text: "错误: 必须提供 post 参数（要删除的文章文件名或标题）" }], isError: true };
+      }
+      const found = findPostFile(post);
+      if (!found) {
+        return {
+          content: [{ type: "text", text: `未找到匹配的文章：${post}。请检查文件名或标题是否正确。` }],
+          isError: true,
+        };
+      }
+      const { fileName, filePath } = found;
+      const contentPreview = readFileSync(filePath, "utf-8");
+      const { frontMatter, body } = parseFrontMatter(contentPreview);
+      const postTitle = frontMatter.title || fileName.replace(/\.md$/, "");
+
+      if (!confirm) {
+        const previewText =
+          `🗑️ **删除预览**\n\n` +
+          `**将删除文章**: ${postTitle}\n` +
+          `**文件名**: ${fileName}\n` +
+          `**路径**: ${filePath}\n\n` +
+          `**内容预览（前 300 字）**:\n---\n${body.substring(0, 300)}${body.length > 300 ? "..." : ""}\n---\n\n` +
+          `⚠️ **请确认是否删除**\n\n` +
+          `确认删除后，请再次调用此工具，并设置 \`confirm: true\`。\n\n` +
+          `删除后将执行：\n` +
+          `1. 删除文件 source/_posts/${fileName}\n` +
+          `2. 提交到 Git 仓库\n` +
+          `${skipDeploy ? "3. 跳过部署" : "3. 执行 Hexo 部署以更新网站"}`;
+        return { content: [{ type: "text", text: previewText }] };
+      }
+
+      unlinkSync(filePath);
+      gitRemoveCommitPush(fileName, commitMessage);
+      let deployResult = "";
+      if (!skipDeploy) {
+        hexoDeploy();
+        resetGeneratedFiles();
+        deployResult = "并已重新部署网站。";
+      } else {
+        deployResult = "（已跳过部署）。";
+      }
+      return {
+        content: [
+          {
+            type: "text",
+            text: `✅ **文章已删除**\n\n**已删除**: ${postTitle}\n**文件名**: ${fileName}\n\n已提交到 Git 仓库${deployResult}`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [{ type: "text", text: `❌ **删除失败**: ${error.message}\n\n${error.stack || ""}` }],
+        isError: true,
+      };
+    }
+  }
+
   return {
     content: [
       {
