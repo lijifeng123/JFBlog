@@ -171,6 +171,8 @@ function resetGeneratedFiles() {
   const cwd = BLOG_ROOT;
   try {
     execSync("git checkout HEAD -- public db.json", { cwd, encoding: "utf-8", stdio: "pipe" });
+    // 删除 public 下未跟踪的生成目录/文件（如 public/2026/），否则会残留在工作区
+    execSync("git clean -fd public", { cwd, encoding: "utf-8", stdio: "pipe" });
   } catch {
     // 若 public/db.json 未跟踪或不存在，忽略
   }
