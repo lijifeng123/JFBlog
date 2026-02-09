@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "jfblog": {
+      "command": "node",
+      "args": ["/Users/lijifeng/Desktop/JFBlog/mcp-server/index.js"],
+      "env": {}
+    }
+  }
+}
+
