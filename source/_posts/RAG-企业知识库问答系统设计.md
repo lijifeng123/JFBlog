@@ -6,6 +6,8 @@ tags: [RAG, AI, Python]
 
 最近在做一个企业知识库问答系统，把整个过程记录下来，顺便把技术选型的思考也写出来，供参考。
 
+项目地址：[rag-knowledge-base](https://github.com/lijifeng123/ai_agent_learning_rag/tree/main/rag-knowledge-base)
+
 ## 为什么要做这个
 
 企业内部文档越来越多，PDF 规范、Word 合同、Markdown 文档，散落在各处。每次找东西都要翻半天，更别说跨文档综合查找了。于是想做一个能直接用自然语言提问的系统，上传文档后直接问"这个合同的付款条款是什么"，系统自动找到相关内容并给出答案。
@@ -30,27 +32,77 @@ RAG 分两个阶段：
 
 关键在于：LLM 不是凭空回答，而是"看着参考资料"回答，这样既能保证准确性，也能避免幻觉。
 
-## 技术选型
+## 技术选型方案对比
 
-选型时面临几个决策点，这里说一下我的思路。
+### Embedding 模型
 
-**Embedding 模型：本地 vs API**
+| 方案 | 代表选项 | 优点 | 缺点 | 费用 |
+|------|----------|------|------|------|
+| 本地模型 | sentence-transformers | 免费、数据不出去、无网络延迟 | 首次加载慢、占用本地内存 | 免费 |
+| OpenAI API | text-embedding-3-small | 效果好、无需本地资源 | 数据上传第三方、有费用 | 按 token 计费 |
+| Voyage AI | voyage-2 | 检索效果优秀 | 数据上传第三方、有费用 | 按 token 计费 |
 
-本地用 `sentence-transformers`，API 用 OpenAI 或 Voyage。
+**本项目选择：sentence-transformers（`paraphrase-multilingual-MiniLM-L12-v2`）**
 
-本地方案的好处是免费、数据不出去、延迟低；缺点是首次加载模型要等几秒。我选了本地，用 `paraphrase-multilingual-MiniLM-L12-v2`，支持中文，384 维向量，效果够用。
+理由：数据本地处理，适合对数据安全有要求的企业场景；支持中文，384 维向量，效果够用；完全免费。
 
-**向量存储：FAISS vs 向量数据库**
+---
 
-文档量不大的话，FAISS 就够了——纯本地文件，不需要起服务，查询速度也快。如果是生产环境、多用户并发，再考虑 Pinecone、Weaviate 这类。
+### 向量存储
 
-**LLM：Claude**
+| 方案 | 代表选项 | 优点 | 缺点 | 适用场景 |
+|------|----------|------|------|----------|
+| 本地文件库 | FAISS | 纯本地、无需启动服务、零运维 | 不支持并发写、不支持分布式 | 单机、中小规模文档 |
+| 托管向量数据库 | Pinecone | 全托管、支持大规模 | 有费用、数据在第三方 | 生产环境、大规模 |
+| 自托管向量数据库 | Weaviate / Qdrant | 功能全、支持并发 | 需要运维、部署复杂 | 多用户、高并发场景 |
+| 传统数据库扩展 | pgvector（PostgreSQL）| 复用现有数据库 | 性能不如专用向量库 | 已有 PG 的项目 |
 
-直接用 Anthropic API，`claude-sonnet-4-6`，效果不错，中文理解也好。
+**本项目选择：FAISS**
 
-**界面：Streamlit**
+理由：文档量不大，单机部署，无需起额外服务；本地文件形式，简单直接，部署零成本。
 
-快速搭一个 Web 界面，Python 写，几十行代码就能跑起来。
+---
+
+### LLM（大语言模型）
+
+| 方案 | 代表选项 | 优点 | 缺点 | 费用 |
+|------|----------|------|------|------|
+| Claude API | claude-sonnet-4-6 | 中文理解好、上下文长、指令遵循强 | 需要 API Key | 按 token 计费 |
+| OpenAI API | GPT-4o | 生态成熟、插件丰富 | 需要 API Key | 按 token 计费 |
+| 本地部署 | Ollama + Llama 3 | 完全本地、数据不出去 | 需要高配 GPU、效果弱于商业模型 | 硬件成本 |
+| 国产模型 | 通义千问、DeepSeek | 中文优化、国内访问稳定 | 部分功能受限 | 按 token 计费 |
+
+**本项目选择：Claude API（claude-sonnet-4-6）**
+
+理由：中文理解和指令遵循效果好，回答质量稳定；长上下文窗口适合塞入多个检索片段。
+
+---
+
+### RAG 实现方式
+
+| 方案 | 说明 | 优点 | 缺点 |
+|------|------|------|------|
+| 手写 RAG | 自己实现各模块 | 完全可控、无额外依赖、便于学习原理 | 开发量稍大 |
+| LangChain | 框架封装全流程 | 文档丰富、快速上手 | 抽象层多、调试复杂、版本变动频繁 |
+| LlamaIndex | 专注于 RAG 场景 | RAG 功能完整 | 学习曲线较陡、灵活性受限 |
+
+**本项目选择：手写 RAG**
+
+理由：逻辑并不复杂，自己实现能完全掌控每个环节，也更便于理解 RAG 的原理。框架封装带来的便利，在这个规模下反而是负担。
+
+---
+
+### Web 界面
+
+| 方案 | 代表选项 | 优点 | 缺点 |
+|------|----------|------|------|
+| Streamlit | streamlit | Python 原生、几十行代码搞定 | 界面定制性有限 |
+| Gradio | gradio | 适合 AI demo | 组件较少 |
+| FastAPI + 前端 | FastAPI + React | 完全定制 | 开发成本高 |
+
+**本项目选择：Streamlit**
+
+理由：快速出可用界面，Python 写，和其他模块无缝集成，适合这种工具型项目。
 
 ## 系统架构
 
@@ -67,8 +119,6 @@ rag-knowledge-base/
 └── generator/
     └── claude_client.py    # Claude API 调用
 ```
-
-每个模块职责单一，比较好维护。
 
 ## 几个实现细节
 
@@ -116,4 +166,4 @@ ANTHROPIC_API_KEY=你的key OMP_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false strea
 
 ---
 
-项目代码在 GitHub 上，感兴趣的可以拉下来跑跑看。
+完整代码：[https://github.com/lijifeng123/ai_agent_learning_rag/tree/main/rag-knowledge-base](https://github.com/lijifeng123/ai_agent_learning_rag/tree/main/rag-knowledge-base)
