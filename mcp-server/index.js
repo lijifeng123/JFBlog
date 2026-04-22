@@ -153,7 +153,7 @@ function hexoDeploy() {
     if (!existsSync(join(cwd, "package.json"))) {
       throw new Error("未找到 Hexo 项目。请确认当前在 JFBlog 项目根目录，且已存在 package.json。");
     }
-    execSync("npx hexo deploy -g", { cwd, encoding: "utf-8" });
+    execSync("npx hexo deploy -g", { cwd, encoding: "utf-8", maxBuffer: 50 * 1024 * 1024 });
     return true;
   } catch (error) {
     const stderr = (error.stderr || error.stdout || error.message || "").toString().trim();
@@ -170,11 +170,15 @@ function hexoDeploy() {
 function resetGeneratedFiles() {
   const cwd = BLOG_ROOT;
   try {
-    execSync("git checkout HEAD -- public db.json", { cwd, encoding: "utf-8", stdio: "pipe" });
-    // 删除 public 下未跟踪的生成目录/文件（如 public/2026/），否则会残留在工作区
-    execSync("git clean -fd public", { cwd, encoding: "utf-8", stdio: "pipe" });
+    execSync("git checkout HEAD -- public db.json", { cwd, encoding: "utf-8", maxBuffer: 10 * 1024 * 1024 });
   } catch {
     // 若 public/db.json 未跟踪或不存在，忽略
+  }
+  try {
+    // 删除 public 下未跟踪的生成目录/文件（如 public/2026/），否则会残留在工作区
+    execSync("git clean -fd -- public", { cwd, encoding: "utf-8", maxBuffer: 10 * 1024 * 1024 });
+  } catch {
+    // 忽略清理失败
   }
 }
 
